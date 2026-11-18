@@ -6,7 +6,7 @@ Spock is a macroeconomic intelligence platform that monitors key economic indica
 
 I decide; Claude proposes, writes and builds. Ideas, decisions and tasks are
 GitHub Issues. The words we agree on are in `GLOSSARY.md`, the big decisions
-in `docs/adr/`. Nothing reaches `main` until I merge a pull request.
+in `docs/adr/`. Nothing reaches `main` until I merge a pull request
 
 ## Day to day
 
