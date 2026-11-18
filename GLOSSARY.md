@@ -42,6 +42,12 @@ An Indicator that moves before the economic consequences appear, such as AI inve
 **Lagging indicator**:
 An Indicator that moves after the economic consequences have happened, such as welfare spending.
 
+### History
+
+**Historical episode**:
+A named stretch of the past that Spock compares today against: the Internet wave (1995 to 2005, the main reference), the Global financial crisis (2008 to 2010) and the Covid shock (2020 to 2021).
+_Avoid_: Period, era, precedent
+
 ### What Spock tells you
 
 **Flag**:
