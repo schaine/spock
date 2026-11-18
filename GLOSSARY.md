@@ -42,6 +42,28 @@ An Indicator that moves before the economic consequences appear, such as AI inve
 **Lagging indicator**:
 An Indicator that moves after the economic consequences have happened, such as welfare spending.
 
+### What Spock tells you
+
+**Flag**:
+A notice that one Indicator is moving unusually compared with its own history, or breaks a rule the Owner wrote for it.
+_Avoid_: Alert, alarm, warning
+
+**Divergence**:
+Two Indicators that normally move together drifting apart, such as productivity rising while real wages stay flat.
+_Avoid_: Gap, decoupling, mismatch
+
+**Pattern**:
+Several Indicators, possibly from different Indicator families or Regions, pointing the same way at the same time.
+_Avoid_: Trend, cluster, signal
+
+**Watched relationship**:
+A link between Indicators that Spock checks regularly for a Divergence or a Pattern, chosen in advance with the Owner, such as productivity against wages.
+_Avoid_: Correlation, rule, hypothesis
+
+**Insight**:
+The written explanation attached to a Flag, a Divergence or a Pattern: what is happening, why it matters and what it might signal.
+_Avoid_: Analysis, commentary, interpretation, summary
+
 ### Using Spock
 
 **Owner**:
