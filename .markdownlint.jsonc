@@ -1,0 +1,5 @@
+{
+  // Default rules, except line length.
+  "default": true,
+  "MD013": false
+}
