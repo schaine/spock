@@ -51,7 +51,7 @@ _Avoid_: Period, era, precedent
 ### What Spock tells you
 
 **Flag**:
-A notice that one Indicator is moving unusually compared with its own history, or breaks a rule the Owner wrote for it.
+A notice that one Indicator is moving unusually compared with its own history, or breaks a rule the Owner wrote for it. Each Flag carries a plain factual sentence, never an interpretation.
 _Avoid_: Alert, alarm, warning
 
 **Divergence**:
@@ -67,13 +67,17 @@ A link between Indicators that Spock checks regularly for a Divergence or a Patt
 _Avoid_: Correlation, rule, hypothesis
 
 **Insight**:
-The written explanation attached to a Flag, a Divergence or a Pattern: what is happening, why it matters and what it might signal.
+The Owner's written explanation of a Flag, a Divergence or a Pattern: what is happening, why it matters and what it might signal. Insights are dated, kept forever, and private to the Owner.
 _Avoid_: Analysis, commentary, interpretation, summary
 
 ### Using Spock
 
 **Owner**:
-The person who runs Spock. Today the Owner is its only user.
+The person who runs Spock and the only one with an account. The Owner writes Insights.
+
+**Visitor**:
+Anyone who views Spock's public pages, without an account.
+_Avoid_: User, reader, subscriber, customer
 
 **Dashboard**:
 The place where a user explores Indicators and their connections over time and across Regions.
