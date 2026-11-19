@@ -60,7 +60,7 @@ _Avoid_: Gap, decoupling, mismatch
 
 **Pattern**:
 Several Indicators, possibly from different Indicator families or Regions, pointing the same way at the same time.
-_Avoid_: Trend, cluster, signal
+_Avoid_: Trend, cluster, signal (that word belongs to the Signals dashboard)
 
 **Watched relationship**:
 A link between Indicators that Spock checks regularly for a Divergence or a Pattern, chosen in advance with the Owner, such as productivity against wages.
@@ -80,4 +80,12 @@ Anyone who views Spock's public pages, without an account.
 _Avoid_: User, reader, subscriber, customer
 
 **Dashboard**:
-The place where a user explores Indicators and their connections over time and across Regions.
+One of Spock's two screens for exploring Indicators and their connections over time and across Regions: the Signals dashboard and the Data dashboard.
+
+**Signals dashboard**:
+The main Dashboard: it shows the Watched relationships, arranged so that their Divergences and Patterns can be read together. Its on-screen label is "Signals".
+_Avoid_: Signals (on its own), main page, overview
+
+**Data dashboard**:
+The secondary Dashboard: it shows the Indicators grouped by Core family, for exploring them one by one. Its on-screen label is "Data".
+_Avoid_: Data (on its own), explorer, raw data
