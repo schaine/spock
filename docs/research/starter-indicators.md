@@ -1,58 +1,97 @@
 # Starter Indicators and Watched relationships
 
 Research note for issue #3: which Indicators and Watched relationships the
-first version of Spock should contain. Written on 2026-11-19.
+first version of Spock should contain. First written on 2026-11-19; revised
+the same day after a second check directly at the publishers and after the
+Owner's decisions (see
+[Decisions by the Owner (2026-11-19)](#decisions-by-the-owner-2026-11-19)).
 
 ## In short
 
-- **24 Indicators** across the five Core families: Jobs and labour markets
+- **25 Indicators** across the five Core families: Jobs and labour markets
   (6), Productivity, wages and income distribution (4), Household income and
   consumption (4), Financial conditions and business failures (5), AI
-  investment and technological adoption (5).
-- **9 Watched relationships**, from "productivity against real wages" to "is
-  AI adoption showing up in productivity in all three Regions?".
+  investment and technological adoption (6).
+- **8 Watched relationships**, from "are workers getting their share of AI's
+  gains?" to "is AI adoption showing up in productivity in all three
+  Regions?".
 - Almost everything comes from **free official sources with a documented
   API** (an API is a web address a program can call to fetch data
-  automatically, instead of a person downloading a file). Six publishers
+  automatically, instead of a person downloading a file). Five publishers
   cover most of the list: FRED (which republishes US agency data), Eurostat,
-  the ECB, INSEE, the Banque de France and the SEC.
+  the ECB, the European Commission's AMECO database and the SEC. **France
+  comes from Eurostat**, so France and the European Union are measured the
+  same way; INSEE and the Banque de France are left out for now.
 - **The Owner needs three free keys** (a key is a password-like code that
-  identifies who is calling an API): FRED, BLS and the US Census Bureau. Two
-  more are optional (Banque de France, INSEE portal). See
+  identifies who is calling an API): FRED, BLS and the US Census Bureau. The
+  SEC needs no key but asks for a contact email, which will be the Owner's
+  personal email, stored as a private setting and never written in this
+  repository. See
   [Keys, registration and usage limits](#keys-registration-and-usage-limits).
 - **The United States has the richest data.** France and the European Union
   are thinner on AI-exposed occupations (yearly instead of monthly), on bank
-  lending (only the member states that use the euro) and on AI investment
-  (no data-centre or company-spending equivalent).
-- **Important limit of this note.** The cloud session that wrote it could not
-  open any of the publishers' websites: the network blocked them all (see
-  [How this note was checked](#how-this-note-was-checked)). Claims were
-  checked only through web-search results of official pages, and many codes
-  and start dates are marked **unverified**. They must be checked against the
-  publishers before the data collection is built.
+  lending and financial stress (only the member states that use the euro),
+  on household loan arrears (no frequent figure) and on AI investment (no
+  data-centre or company-spending equivalent).
+- **Better history than first thought.** Eurostat's French figures for jobs,
+  productivity, pay, household income and saving start in **1980 to 1983**,
+  so France can be compared with the Internet wave without INSEE. The
+  European Union as a whole mostly starts in 1995 to 2000.
+- **Most claims are now checked at the source.** In a second pass on
+  2026-11-19, codes, frequencies and start dates were checked directly at
+  the publishers (mark **[V]**). What could not be checked is still marked,
+  with the reason: mainly the BLS website, the SEC website (which refuses
+  requests without a declared contact) and the BLS API's daily limit.
 
 ## How this note was checked
 
-Every fact below carries one of two marks:
+Every fact below carries one of three marks:
 
+- **[V]**: verified directly at the publisher on 2026-11-19, by opening the
+  publisher's page, file or API answer.
 - **[S]**: seen on the publisher's own page, but only through a web-search
   result describing that page; the page itself could not be opened.
-- **[U]**: unverified. Comes from prior knowledge or from an unofficial copy
-  of the data (for example DBnomics). Treat it as a lead, not a fact.
+- **[U]**: unverified. Comes from prior knowledge, from an unofficial copy
+  of the data, or from the Owner's earlier reading, and could not be checked
+  in either pass. Treat it as a lead, not a fact.
 
-No claim could be marked as directly verified. From this session, both a
-direct download and the web-page reader were refused for every host tried:
-`api.bls.gov`, `fred.stlouisfed.org`, `api.stlouisfed.org`, `ec.europa.eu`,
-`data-api.ecb.europa.eu`, `api.insee.fr`, `bdm.insee.fr`,
-`webstat.banque-france.fr`, `data.sec.gov`, `www.sec.gov`,
-`dares.travail-emploi.gouv.fr`, `statistiques.francetravail.org`,
-`www.bls.gov` and `www.insee.fr`. The network gateway answered "403
-Forbidden" (access refused).
+**First pass (morning of 2026-11-19).** The cloud session could not open any
+publisher's website: the network gateway refused every host with "403
+Forbidden". Claims were marked [S] or [U] only.
 
-Following `docs/agents/decisions.md`, section 10: before anyone writes the
-data collection, these hosts should be added to the cloud environment's
-allowed domains (list in [Hosts to allow](#hosts-to-allow)), and every [U]
-item re-checked against the publisher.
+**Second pass (evening of 2026-11-19).** The publishers' hosts were added to
+the cloud environment. Each kept Indicator was then checked as follows:
+
+- **FRED**: the page of each code at `fred.stlouisfed.org/series/<code>`,
+  which gives the title, units, frequency, first and last date, and often
+  the original publisher's code. (FRED's free download link without a key
+  did not answer from this network, so the pages were used instead.)
+- **Eurostat**: the dissemination API, without a key, for each dataset with
+  France (`FR`) and the European Union (`EU27_2020`), reading the first and
+  last date that has a value; plus Eurostat's catalogue of all datasets, to
+  find closed and replacement datasets.
+- **ECB**: the data API, without a key, for each exact code.
+- **AMECO** (European Commission): its web query service on `ec.europa.eu`.
+- **SEC**: the `data.sec.gov` API for each company's reported figures and
+  list of filings.
+- **US Census Bureau** and **US Courts**: their web pages and downloadable
+  files.
+
+**Still blocked in the second pass:**
+
+- `www.bls.gov` refused every request ("403 Forbidden"), even when the
+  request imitated a web browser. BLS facts seen only through search stay
+  [S].
+- The BLS API (`api.bls.gov`) answered once, then refused: the daily
+  allowance for callers without a key, shared by everyone on this network,
+  was used up. This is itself a reason to get the free BLS key.
+- `www.sec.gov` refused this pass's requests, which did not carry a
+  declared contact. Anthropic's prospectus (a large document on
+  `www.sec.gov`) had been downloaded earlier the same day by the main
+  session, and its figures were then read from that copy, so they are [V].
+  `data.sec.gov` answered normally.
+- The Census API now refuses every request without a key (it sends callers
+  to a "missing key" page) [V], so what it holds was not checked.
 
 ### Words used in this note
 
@@ -62,18 +101,26 @@ item re-checked against the publisher.
   yearly).
 - **Seasonally adjusted**: corrected for regular calendar effects (summer
   jobs, Christmas shopping) so that months can be compared with each other.
+  Eurostat writes `SA` (seasonally adjusted) and `SCA` (seasonally and
+  calendar adjusted, which also corrects for the number of working days).
 - **Index (2017 = 100)**: a value shown relative to a reference year set to
   100. A value of 110 means 10% higher than in 2017.
-- **ISCO / SOC / FAP / PCS / ROME**: job classifications. ISCO is the
-  international one used by Eurostat; SOC is the US one; FAP, PCS and ROME are
-  French ones (used by DARES, INSEE and France Travail).
-- **NACE**: the European classification of industries.
+- **Chain-linked volumes** or **quantity index**: a value corrected for
+  price changes, so that it measures quantities rather than money.
+- **ISCO / SOC**: job classifications. ISCO is the international one used by
+  Eurostat; SOC is the US one.
+- **NACE**: the European classification of industries. Eurostat is moving
+  from version 2 to **version 2.1**, which changes some section letters
+  (for example, IT services move from section J to section K). National
+  accounts still use version 2 [V].
+- **Computed by Spock**: an Indicator that no publisher publishes as such,
+  which Spock calculates from published figures, with the method shown.
 
-## The 24 Indicators
+## The 25 Indicators
 
 Each Indicator below gives what it measures, why it reveals the economic
-consequences of AI, its Core family, whether it is Leading or Lagging, and a
-table with one row per Region.
+consequences of AI, its Core family, whether it is Leading or Lagging, a
+table with one row per Region, and which industry breakdown exists.
 
 "Before 1995?" says whether the data goes back far enough to compare with
 the Internet wave (1995 to 2005), the main Historical episode.
@@ -81,6 +128,8 @@ the Internet wave (1995 to 2005), the main Historical episode.
 Some Indicators move at about the same time as the economy rather than
 clearly before or after. The glossary has only two labels, so those were
 placed where they best fit Spock's purpose; the reason is given each time.
+
+"Since" gives the first date with a value, as found at the publisher.
 
 ### Family 1: Jobs and labour markets
 
@@ -95,15 +144,21 @@ outpacing new jobs.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS (Current Population Survey), via FRED | `UNRATE` (BLS `LNS14000000`) [U] | Monthly | 1948 [U] | Yes | FRED API (key) or BLS API |
-| France | INSEE (Labour Force Survey, ILO definition) | INSEE BDM code to confirm [U]; alternative Eurostat `une_rt_m`, geo `FR` [S] | Quarterly (INSEE); monthly (Eurostat) | 1975 for mainland France [U]; INSEE's own tables show 2004 onward [S] | Probably (mainland France) [U] | INSEE BDM; Eurostat API |
-| European Union | Eurostat | `une_rt_m`, geo `EU27_2020`, seasonally adjusted [S] | Monthly | 2000 for the EU aggregate [U] | No (EU aggregate) | Eurostat API |
+| United States | BLS (Current Population Survey), via FRED | `UNRATE` (BLS `LNS14000000`) [V] | Monthly [V] | January 1948 [V] | Yes | FRED API (key) [V] |
+| France | Eurostat (data from INSEE's Labour Force Survey) | `une_rt_m`, geo `FR`, age `TOTAL`, `SA`, unit `PC_ACT` [V] | Monthly [V] | January 1983 [V] | Yes | Eurostat API (no key) [V] |
+| European Union | Eurostat | `une_rt_m`, geo `EU27_2020`, same options [V] | Monthly [V] | January 2000 [V] | No | Eurostat API [V] |
 
-Notes: from the second quarter of 2026, INSEE publishes its main labour
-figures for "France" including Mayotte, and keeps the old "France excluding
-Mayotte" rate only in a side file [S]
+Notes: from the second quarter of 2026, INSEE publishes its labour figures
+for all of France including Mayotte, with long figures rebuilt back to 1982;
+the old "France excluding Mayotte" rate is kept only in a side file [V]
 ([INSEE methodological note 2026 Q2](https://www.insee.fr/fr/statistiques/documentation/Note_methodologique_2026T2.pdf)).
-Spock must pick one and keep it.
+Eurostat's French figure comes from the same survey, so a break or revision
+may appear in it; the first build should compare the two once.
+
+Industry breakdown: United States, unemployment by industry of the last job
+(for example `LNU04032237`, information industry, monthly from 2000, not
+seasonally adjusted) [V]; France and European Union, none in this monthly
+dataset (only age and sex) [V].
 
 #### 2. Total employment
 
@@ -116,12 +171,19 @@ people.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS (payroll survey), via FRED | `PAYEMS` (BLS `CES0000000001`) [U] | Monthly | 1939 [U] | Yes | FRED API |
-| France | Eurostat (national accounts) | `namq_10_pe`, geo `FR` [U] | Quarterly | 1995 [U] | No | Eurostat API |
-| European Union | Eurostat (national accounts) | `namq_10_pe`, geo `EU27_2020` [U] | Quarterly | 1995 [U] | No | Eurostat API |
+| United States | BLS (payroll survey), via FRED | `PAYEMS` (BLS `CES0000000001`) [V] | Monthly [V] | January 1939 [V] | Yes | FRED API |
+| France | Eurostat (national accounts) | `namq_10_pe`, geo `FR`, `EMP_DC`, unit `THS_PER`, `SA` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat (national accounts) | `namq_10_pe`, geo `EU27_2020`, `EMP_DC`, `SCA` [V] | Quarterly [V] | 1995 Q1 [V] | No | Eurostat API |
 
-INSEE's quarterly salaried-employment estimates are a French alternative with
-longer history [U].
+France is published seasonally adjusted but not calendar adjusted (`SA`);
+the EU total is published with both (`SCA`) [V]. The difference is small but
+should be shown.
+
+Industry breakdown: United States, every industry in the payroll survey (for
+example `USINFO`, Indicator 6) [V]; France and European Union, ten industry
+groups in `namq_10_a10_e` (agriculture, industry, construction, trade and
+transport, information and communication, finance, real estate,
+professional services, public services, other services) [V].
 
 #### 3. Job openings (vacancies)
 
@@ -133,18 +195,27 @@ more with the same staff, openings fall before unemployment rises.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS (JOLTS survey), via FRED | `JTSJOL` (BLS `JTS000000000000000JOL`) [U] | Monthly | December 2000 [S] | No | FRED API |
-| France | Eurostat job vacancy statistics (data from DARES) | `jvs_q_nace2`, geo `FR` [S] | Quarterly | Dataset from 2001; France's start date not confirmed [S] | No | Eurostat API |
-| European Union | Eurostat | `jvs_q_nace2`, geo `EU27_2020` [S] | Quarterly | 2001 for the dataset [S]; EU aggregate start unconfirmed | No | Eurostat API |
+| United States | BLS (JOLTS survey), via FRED | `JTSJOL` [V] (BLS `JTS000000000000000JOL` [U]) | Monthly [V] | December 2000 [V] | No | FRED API |
+| France | Eurostat job vacancy statistics (data from DARES) | `jvs_q_r21`, geo `FR`, all industries `B-T`, all firm sizes `TOTAL` [V] | Quarterly [V] | 2011 Q2 for all firm sizes; 2003 Q2 for firms with 10 or more employees [V] | No | Eurostat API |
+| European Union | Eurostat | `jvs_q_r21`, geo `EU27_2020`, `B-T`; only the vacancy rate (`JVR`) is published for the EU total, not a count [V] | Quarterly [V] | 2010 Q1 [V] | No | Eurostat API |
+
+**Correction:** the first pass named `jvs_q_nace2`. Eurostat closed it with
+data up to the end of 2025; its replacement, by NACE version 2.1, is
+`jvs_q_r21`, which holds the full history from 2001 [V].
 
 Notes: JOLTS gives openings by industry and US census region, **not by
-occupation** [S]
-([BLS JOLTS history](https://www.bls.gov/opub/hom/jlt/history.htm)).
-Eurostat notes that France's vacancy figures are "not strictly comparable"
-with other member states, and France widened its coverage to firms with fewer
-than 10 employees at some point [S]
-([Eurostat release](https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/3-15032024-ap)).
-The ECB republishes the same Eurostat data [S].
+occupation** [S] ([BLS JOLTS history](https://www.bls.gov/opub/hom/jlt/history.htm));
+FRED lists a table "Job Openings by Industry and Region" [V]. Eurostat says
+France's vacancy figures are "not strictly comparable" with other member
+states [V]
+([Eurostat release, March 2024](https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/3-15032024-ap)).
+France's survey covered workplaces with 10 or more employees from 2003 Q2 to
+2011 Q1 and workplaces with 1 or more employee from 2011 Q2 [V]
+([Eurostat metadata for France](https://ec.europa.eu/eurostat/cache/metadata/EN/jvs_esqrs_fr.htm)).
+
+Industry breakdown: United States, JOLTS by industry (for example
+`JTU5100JOL`, information, from December 2000, not seasonally adjusted) [V];
+France and European Union, 33 industry groups by NACE version 2.1 [V].
 
 #### 4. Youth unemployment rate (under 25)
 
@@ -158,12 +229,14 @@ everyone else.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS, via FRED | `LNS14024887` (ages 16 to 24) [U] | Monthly | 1948 [U] | Yes | FRED API |
-| France | Eurostat | `une_rt_m`, geo `FR`, age `Y_LT25` [S] | Monthly | 1983 per an unofficial copy [U] | Probably [U] | Eurostat API |
-| European Union | Eurostat | `une_rt_m`, geo `EU27_2020`, age `Y_LT25` [S] | Monthly | 2000 [U] | No | Eurostat API |
+| United States | BLS, via FRED | `LNS14024887` (ages 16 to 24) [V] | Monthly [V] | January 1948 [V] | Yes | FRED API |
+| France | Eurostat | `une_rt_m`, geo `FR`, age `Y_LT25` [V] | Monthly [V] | January 1983 [V] | Yes | Eurostat API |
+| European Union | Eurostat | `une_rt_m`, geo `EU27_2020`, age `Y_LT25` [V] | Monthly [V] | January 2000 [V] | No | Eurostat API |
 
-The US uses ages 16 to 24, Eurostat 15 to 24: the levels are not directly
-comparable, only their direction.
+The US uses ages 16 to 24, Eurostat 15 to 24 [U]: the levels are not
+directly comparable, only their direction.
+
+Industry breakdown: none in any Region for this age group.
 
 #### 5. Employment in AI-exposed occupations
 
@@ -179,8 +252,15 @@ whether AI is replacing work. Details are in
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
 | United States | BLS (OEWS survey) | OEWS by SOC code, e.g. `43-0000`, `43-4051`, `27-3091`, `15-1252` [U] | Yearly (May reference) [S] | 1997 [S] | No | BLS API, latest year only [U]; files for history |
-| France | France Travail (BMO hiring plans) and INSEE/DARES (Labour Force Survey) | BMO by FAP2021 job family [S]; Eurostat `lfsa_egai2d`, geo `FR` [S] | Yearly | BMO yearly since the 2000s [U]; `lfsa_egai2d` from 2011 [S] | No | Eurostat API; BMO as open-data files [S] |
-| European Union | Eurostat (Labour Force Survey) | `lfsa_egai2d`, ISCO-08 two-digit codes `41`, `42`, `25` [S] | Yearly (two-digit); quarterly only at one-digit level [S] | 2011 [S] | No (ISCO-88 data before 2011 is a separate, not comparable dataset [U]) | Eurostat API |
+| France | Eurostat (Labour Force Survey) | `lfsa_egai2d`, geo `FR`, codes `OC41`, `OC42`, `OC25` [V] | Yearly [V] | 2011 [V] | No | Eurostat API |
+| European Union | Eurostat (Labour Force Survey) | `lfsa_egai2d`, geo `EU27_2020`, same codes [V] | Yearly [V] | 2011 [V] | No (older data uses a different classification [U]) | Eurostat API |
+
+**Corrections:** Eurostat's occupation codes carry the prefix `OC` (`OC41`,
+not `41`) [V]. France Travail's hiring-plans survey (BMO) is no longer
+proposed here: see [Later additions](#later-additions).
+
+Industry breakdown: not used. This Indicator is already a breakdown, by
+occupation.
 
 #### 6. Employment in the information and professional-services industries
 
@@ -194,9 +274,12 @@ data of Indicator 5.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS, via FRED | `USINFO` (Information, BLS `CES5000000001`); BLS `CES6054000001` (professional, scientific and technical services); BLS `CES6054150001` (computer systems design) [U] | Monthly | 1939 (Information) [U]; 1990 (the others) [U] | Yes | FRED API; BLS API |
-| France | Eurostat (national accounts by industry) | `namq_10_a10_e`, geo `FR`, NACE sections `J` and `M_N` [U] | Quarterly | 1995 [U] | No | Eurostat API |
-| European Union | Eurostat | `namq_10_a10_e`, geo `EU27_2020`, `J` and `M_N` [U] | Quarterly | 1995 [U] | No | Eurostat API |
+| United States | BLS, via FRED | `USINFO` (Information, BLS `CES5000000001`) [V]; `CES6054000001` (professional, scientific and technical services) [V]; `CES6054150001` (computer systems design) [V] | Monthly [V] | January 1939 (Information) [V]; January 1990 (the others) [V] | Yes | FRED API |
+| France | Eurostat (national accounts by industry) | `namq_10_a10_e`, geo `FR`, NACE `J` and `M_N`, `SA` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat | `namq_10_a10_e`, geo `EU27_2020`, `J` and `M_N`, `SCA` [V] | Quarterly [V] | 1995 Q1 [V] | No | Eurostat API |
+
+Industry breakdown: this Indicator is itself the industry detail of
+Indicator 2.
 
 ### Family 2: Productivity, wages and income distribution
 
@@ -211,13 +294,19 @@ rises; it is the first place the benefit of AI should appear.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS (Productivity and Costs), via FRED | `OPHNFB`, nonfarm business, index 2017 = 100, seasonally adjusted [S] | Quarterly [S] | 1947 [U] | Yes | FRED API |
-| France | Eurostat | `namq_10_lp_ulc`, geo `FR`, real labour productivity per hour [U] | Quarterly | 1995 [U] | No | Eurostat API |
-| European Union | Eurostat | `namq_10_lp_ulc`, geo `EU27_2020` [U] | Quarterly | 1995 [U] | No | Eurostat API |
+| United States | BLS (Productivity and Costs), via FRED | `OPHNFB`, nonfarm business, index 2017 = 100, seasonally adjusted [V] | Quarterly [V] | 1947 Q1 [V] | Yes | FRED API |
+| France | Eurostat | `namq_10_lp_ulc`, geo `FR`, `RLPR_HW` (real labour productivity per hour worked), index 2020 = 100, `SCA` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat | `namq_10_lp_ulc`, geo `EU27_2020`, same options [V] | Quarterly [V] | 1995 Q1 [V] | No | Eurostat API |
 
-Source for the US code: [FRED OPHNFB](https://fred.stlouisfed.org/series/OPHNFB) [S].
-For France and the EU, the European Commission's AMECO database has yearly
-productivity back to 1960 [U] and would cover the Internet wave.
+**Correction:** France's figure starts in 1980, not 1995 [V]. For the EU
+total, AMECO (Indicator 9) has yearly figures from 1995 only [V], so it
+does not reach further back.
+
+Industry breakdown: United States, BLS publishes productivity for detailed
+industries in a separate programme [U], not used here; France and European
+Union, none published in this dataset [V]. It could be computed by Spock
+from value added (`namq_10_a10`) and hours (`namq_10_a10_e`) by industry,
+both of which exist [V].
 
 #### 8. Real compensation per hour
 
@@ -229,14 +318,23 @@ rises. It tells whether workers share in AI productivity gains.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS, via FRED | `COMPRNFB`, nonfarm business, index 2017 = 100, seasonally adjusted [S] | Quarterly [S] | 1947 [S] | Yes | FRED API |
-| France | Eurostat (compensation of employees and hours, national accounts) divided by Eurostat consumer prices | Computed from `namq_10_a10` (compensation `D1`), `namq_10_a10_e` (hours) and `prc_hicp_midx` (prices) [U] | Quarterly | 1995 [U] | No | Eurostat API |
-| European Union | Eurostat, same method | Same codes, geo `EU27_2020` [U] | Quarterly | 1995 [U]; EU prices from 1996 [U] | No | Eurostat API |
+| United States | BLS, via FRED | `COMPRNFB`, nonfarm business, index 2017 = 100, seasonally adjusted [V] | Quarterly [V] | 1947 Q1 [V] | Yes | FRED API |
+| France | **Computed by Spock** from Eurostat: compensation of employees ÷ hours worked ÷ consumer prices | `namq_10_a10`, `TOTAL`, `D1`, `SA` (France has no `SCA` version) [V]; `namq_10_a10_e`, `TOTAL`, `EMP_DC`, unit `THS_HW` [V]; `prc_hicp_minr`, `TOTAL`, index 2025 = 100 [V] | Quarterly | Pay and hours 1980 Q1 [V]; prices January 1996 [V], so the Indicator starts in 1996 | No (from 1996) | Eurostat API |
+| European Union | **Computed by Spock**, same method | Same codes, geo `EU27_2020`, `SCA` [V] | Quarterly | Pay and hours 1995 Q1 [V]; prices December 1999 [V], so the Indicator starts in 2000 | No | Eurostat API |
 
-For France and the EU this Indicator is **computed by Spock**, not published
-as such. That is a choice the Owner may want to make knowingly (see
-[Open questions](#open-questions-for-the-owner)).
-Source for the US code: [FRED COMPRNFB](https://fred.stlouisfed.org/series/COMPRNFB) [S].
+**Corrections:** the consumer price dataset named in the first pass,
+`prc_hicp_midx`, was closed with data up to December 2025; its replacement
+is `prc_hicp_minr` [V]. The EU price index starts in December 1999 in the
+replacement, not 1996 [V].
+
+The Owner accepted computed Indicators (decision 2). A choice remains on
+which price index to divide by: see
+[Open questions](#open-questions-for-the-owner).
+Source for the US code: [FRED COMPRNFB](https://fred.stlouisfed.org/series/COMPRNFB) [V].
+
+Industry breakdown: United States, none for this figure; France and European
+Union, compensation is published by industry in `namq_10_a10` [V], so a
+computed industry version is possible.
 
 #### 9. Labour share of income
 
@@ -249,16 +347,24 @@ share falls.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BLS, via FRED | `PRS85006173`, nonfarm business labour share, index 2017 = 100 [S] | Quarterly [S] | 1947 [S] | Yes | FRED API |
-| France | European Commission (AMECO) | Adjusted wage share, AMECO code `ALCD2` [U] | Yearly | 1960 [U] | Yes | AMECO download; API not confirmed [U] |
-| European Union | European Commission (AMECO) | `ALCD2`, EU27 [U] | Yearly | 1960 [U] | Yes | Same |
+| United States | BLS, via FRED | `PRS85006173`, nonfarm business labour share, index 2017 = 100 [V] | Quarterly [V] | 1947 Q1 [V] | Yes | FRED API |
+| France | European Commission (AMECO) | Adjusted wage share, `ALCD2`, % of GDP at factor cost [V] | Yearly [V] | 1960 [V] | Yes | AMECO web query on `ec.europa.eu`, no key [V]; no documented API [U] |
+| European Union | European Commission (AMECO) | `ALCD2`, EU27 [V] | Yearly [V] | 1995 [V] | No | Same |
+
+**Corrections:** the EU total starts in 1995, not 1960 [V]. AMECO's latest
+years are the Commission's **forecasts** (in November 2026 it showed values
+for 2026 and 2027) [V]; Spock must keep only past years, or label forecasts
+clearly.
 
 A quarterly French and EU version can be computed from Eurostat national
 accounts (compensation of employees divided by value added), but it ignores
-the self-employed [U]. Source for the US code:
-[FRED PRS85006173](https://fred.stlouisfed.org/series/PRS85006173) [S].
-Note: the BLS figure is an index of labour's share of business output, not a
-percentage of GDP [S].
+the self-employed [U]. The BLS figure is an index of labour's share of
+business output, not a percentage of GDP [V].
+
+Note: labour share moves roughly as real pay divided by productivity
+(Indicators 8 and 7), which is why it supports Watched relationship W1.
+
+Industry breakdown: none in any Region.
 
 #### 10. Income inequality (Gini coefficient)
 
@@ -270,11 +376,14 @@ everything). It shows whether AI's gains concentrate on a few.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Census Bureau, via FRED | `GINIALLRH` (household income) [U] | Yearly | 1967 [U] | Yes | FRED API |
-| France | Eurostat (EU-SILC survey) | `ilc_di12`, geo `FR` [U] | Yearly | 2004 [U] | No | Eurostat API |
-| European Union | Eurostat (EU-SILC survey) | `ilc_di12`, geo `EU27_2020` [U] | Yearly | 2010 [U] | No | Eurostat API |
+| United States | Census Bureau, via FRED | `GINIALLRH` (household income, scale 0 to 1) [V] | Yearly [V] | 1967 [V] | Yes | FRED API |
+| France | Eurostat (EU-SILC survey) | `ilc_di12`, geo `FR`, `GINI_HND` (scale 0 to 100) [V] | Yearly [V] | 2004 [V] | No | Eurostat API |
+| European Union | Eurostat (EU-SILC survey) | `ilc_di12`, geo `EU27_2020`, `GINI_HND` [V] | Yearly [V] | 2010 [V] | No | Eurostat API |
 
-INSEE publishes a longer French Gini from its own tax-based survey [U].
+The US and Eurostat use different scales (0 to 1 and 0 to 100) [V] and
+different income definitions; compare their direction only.
+
+Industry breakdown: none (Eurostat splits by age only) [V].
 
 ### Family 3: Household income and consumption
 
@@ -289,9 +398,15 @@ households feel it.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BEA, via FRED | `DSPIC96` [U] | Monthly | 1959 [U] | Yes | FRED API |
-| France | INSEE (quarterly accounts), or Eurostat | INSEE household purchasing power, BDM code to confirm [U]; Eurostat `nasq_10_ki`, geo `FR` [U] | Quarterly | 1949 (INSEE) [U]; 1999 (Eurostat) [U] | Yes (INSEE) [U] | INSEE BDM; Eurostat API |
-| European Union | Eurostat | `nasq_10_ki`, real household income per person, `EU27_2020` [U] | Quarterly | 1999 [U] | No | Eurostat API |
+| United States | BEA, via FRED | `DSPIC96`, chained 2017 dollars, total [V] | Monthly [V] | January 1959 [V] | Yes | FRED API |
+| France | Eurostat (sector accounts) | `nasq_10_ki`, geo `FR`, `B6G_R_HAB_2010` (real gross disposable income per person, 2010 = 100), `SCA` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat | `nasq_10_ki`, geo `EU27_2020`, same [V] | Quarterly [V] | 1999 Q1 [V] | No | Eurostat API |
+
+**Correction:** France via Eurostat starts in 1980, not 1999 [V]. Eurostat's
+figure is per person; the US figure is a total [V]. Spock should divide the
+US figure by population, or compare growth rates only.
+
+Industry breakdown: not applicable (households, not industries).
 
 #### 12. Real household consumption
 
@@ -304,9 +419,14 @@ named in the glossary.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BEA, via FRED | `PCEC96` (monthly) [U]; `PCECC96` (quarterly) [U] | Monthly / quarterly | 2002 monthly [U]; 1947 quarterly [U] | Yes (quarterly) | FRED API |
-| France | INSEE (household consumption of goods) or Eurostat | INSEE BDM code to confirm (monthly, goods only) [U]; Eurostat `namq_10_gdp`, item `P31_S14`, geo `FR` [U] | Monthly (INSEE) / quarterly (Eurostat) | 1980 (INSEE) [U]; 1995 (Eurostat) [U] | Yes (INSEE) [U] | INSEE BDM; Eurostat API |
-| European Union | Eurostat | `namq_10_gdp`, `P31_S14`, `EU27_2020` [U] | Quarterly | 1995 [U] | No | Eurostat API |
+| United States | BEA, via FRED | `PCEC96` (monthly) [V]; `PCECC96` (quarterly) [V] | Monthly / quarterly [V] | January 2007 monthly [V]; 1947 Q1 quarterly [V] | Yes (quarterly) | FRED API |
+| France | Eurostat | `namq_10_gdp`, `P31_S14`, unit `CLV20_MEUR`, `SCA`, geo `FR` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat | `namq_10_gdp`, `P31_S14`, `EU27_2020` [V] | Quarterly [V] | 1995 Q1 [V] | No | Eurostat API |
+
+**Corrections:** FRED's monthly figure starts in 2007, not 2002 [V]. France
+via Eurostat starts in 1980, not 1995 [V].
+
+Industry breakdown: not applicable.
 
 #### 13. Household saving rate
 
@@ -319,12 +439,14 @@ spending ahead.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BEA, via FRED | `PSAVERT` [U] | Monthly | 1959 [U] | Yes | FRED API |
-| France | INSEE or Eurostat | INSEE BDM code to confirm [U]; Eurostat `nasq_10_ki`, gross household saving rate, `FR` [U] | Quarterly | 1949 (INSEE) [U]; 1999 (Eurostat) [U] | Yes (INSEE) [U] | INSEE BDM; Eurostat API |
-| European Union | Eurostat | `nasq_10_ki`, `EU27_2020` [U] | Quarterly | 1999 [U] | No | Eurostat API |
+| United States | BEA, via FRED | `PSAVERT` [V] | Monthly [V] | January 1959 [V] | Yes | FRED API |
+| France | Eurostat | `nasq_10_ki`, `SRG_S14_S15` (gross household saving rate), `SCA`, geo `FR` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat | `nasq_10_ki`, `SRG_S14_S15`, `EU27_2020` [V] | Quarterly [V] | 1999 Q1 [V] | No | Eurostat API |
 
-US and European saving rates are defined differently (net versus gross);
-compare their direction, not their level [U].
+Eurostat's rate is "gross" [V]; the US rate is net of depreciation [U].
+Compare their direction, not their level.
+
+Industry breakdown: not applicable.
 
 #### 14. Consumer confidence and unemployment fears
 
@@ -337,13 +459,17 @@ before it shows in spending.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | University of Michigan, via FRED | `UMCSENT` [U] | Monthly | 1978 monthly [U] | Yes | FRED API; reuse terms to check [U] |
-| France | INSEE (household survey "Camme") | Synthetic confidence indicator, BDM code to confirm [U]; INSEE also publishes an unemployment-fears balance [U] | Monthly | January 1987 [S] | Yes | INSEE BDM |
-| European Union | European Commission survey, via Eurostat | `ei_bsco_m`, indicator `BS-CSMCI` [S]; unemployment expectations code to confirm [U] | Monthly | 1985 for many member states [S]; EU aggregate start unconfirmed | Yes [S] | Eurostat API |
+| United States | University of Michigan, via FRED | `UMCSENT` [V] | Monthly [V] | Monthly from January 1978; older, less frequent values in `UMCSENT1` [V] | Yes | FRED API; third-party data, see [Keys](#keys-registration-and-usage-limits) [V] |
+| France | European Commission survey, via Eurostat | `ei_bsco_m`, geo `FR`, `BS-CSMCI` (confidence) and `BS-UE-NY` (unemployment expectations), `SA` [V] | Monthly [V] | January 1985 [V] | Yes | Eurostat API |
+| European Union | European Commission survey, via Eurostat | `ei_bsco_m`, geo `EU27_2020`, same codes [V] | Monthly [V] | January 1985 [V] | Yes | Eurostat API |
 
-Sources: [INSEE Camme survey](https://www.insee.fr/en/metadonnees/source/s1046) [S].
-INSEE's index and the European Commission's French figure are weighted
-differently and can move differently [S].
+**Corrections:** the EU unemployment-expectations code is `BS-UE-NY` [V];
+the EU total starts in January 1985 [V]. INSEE's own French survey is no
+longer used (decision 1); it is weighted differently from the European
+Commission's French figure and can move differently [S]. FRED notes that the
+University of Michigan asks for its data to be shown one month late [V].
+
+Industry breakdown: not applicable.
 
 ### Family 4: Financial conditions and business failures
 
@@ -358,15 +484,20 @@ overall strain on firms.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Administrative Office of the US Courts | Business bankruptcy filings, statistical table F-2 [U] | Quarterly | Decades back [U] | Probably [U] | **No API**: downloadable tables only [U] |
-| France | Banque de France | Business failures, 12-month total; Webstat code to confirm [S] | Monthly [S] | December 1991 [S] | Yes | Webstat API (free account) [S]; or Eurostat `sts_rb_q`, geo `FR` [S] |
-| European Union | Eurostat | `sts_rb_q`, bankruptcy declarations, index 2021 = 100 [S] | Quarterly [S] | 2015 [S] | No | Eurostat API |
+| United States | Administrative Office of the US Courts | Table F-2, "Business and Nonbusiness Cases Filed, by Chapter of the Bankruptcy Code" [V] | Quarterly [V] | Quarterly tables listed on the site from 2007 [V]; older years [U] | Probably [U] | **No API**: one PDF and one Excel file per quarter [V] |
+| France | Eurostat | `sts_rb_q`, `BKRT` (bankruptcy declarations), geo `FR`, index 2021 = 100, `SCA` [V] | Quarterly [V] (monthly in `sts_rb_m` [V]) | 2015 Q1 [V] | No | Eurostat API |
+| European Union | Eurostat | `sts_rb_q`, `BKRT`, geo `EU27_2020` [V] | Quarterly [V] (monthly in `sts_rb_m` [V]) | 2015 Q1 [V] | No | Eurostat API |
 
-Sources: [Banque de France monthly bulletin](https://www.banque-france.fr/fr/statistiques/entreprises/defaillances-dentreprises-2026-07) [S];
-[Eurostat registrations and bankruptcies](https://ec.europa.eu/eurostat/statistics-explained/index.php/Quarterly_registrations_of_new_businesses_and_declarations_of_bankruptcies_-_statistics) [S].
-Eurostat publishes an index, not counts, because registration procedures differ
-between member states [S]. Banque de France figures are revised each month
-as court records arrive [S].
+France now comes from Eurostat, not the Banque de France (decisions 1 and 4).
+Eurostat publishes only an index and percentage changes, not counts [V];
+the first pass's reason, that registration procedures differ between member
+states, was seen only through search [S]
+([Eurostat registrations and bankruptcies](https://ec.europa.eu/eurostat/statistics-explained/index.php/Quarterly_registrations_of_new_businesses_and_declarations_of_bankruptcies_-_statistics);
+this link now opens Eurostat's main page [V]).
+
+Industry breakdown: United States, by chapter of the bankruptcy code, not by
+industry [V]; France and European Union, nine industry groups, including
+information and communication (`J`) [V].
 
 #### 16. New business creations
 
@@ -378,12 +509,17 @@ or push laid-off workers into self-employment.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Census Bureau (Business Formation Statistics), via FRED | `BABATOTALSAUS` (business applications) [U] | Monthly (also weekly) [U] | July 2004 [U] | No | FRED API |
-| France | INSEE (business creations) | BDM code to confirm [U] | Monthly | 2000 [U] | No | INSEE BDM |
-| European Union | Eurostat | `sts_rb_q`, registrations, index 2021 = 100 [S] | Quarterly [S] | 2015 [S] | No | Eurostat API |
+| United States | Census Bureau (Business Formation Statistics), via FRED | `BABATOTALSAUS` (business applications), seasonally adjusted [V] | Monthly [V] | July 2004 [V] | No | FRED API |
+| France | Eurostat | `sts_rb_q`, `REG` (registrations), geo `FR`, index 2021 = 100, `SCA` [V] | Quarterly [V] (monthly in `sts_rb_m` [V]) | 2015 Q1 [V] | No | Eurostat API |
+| European Union | Eurostat | `sts_rb_q`, `REG`, `EU27_2020` [V] | Quarterly [V] (monthly in `sts_rb_m` [V]) | 2015 Q1 [V] | No | Eurostat API |
 
-French creations include many sole traders ("micro-entrepreneurs"), so
-changes in their legal regime move the number [U].
+France now comes from Eurostat, not INSEE (decision 1). French creations
+include many sole traders ("micro-entrepreneurs"), so changes in their legal
+regime move the number [U].
+
+Industry breakdown: United States, by industry sector (for example
+`BABANAICS51SAUS`, information) [V]; France and European Union, the same
+nine groups as Indicator 15 [V].
 
 #### 17. Bank lending standards
 
@@ -396,9 +532,15 @@ first.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Federal Reserve (Senior Loan Officer Survey), via FRED | `DRTSCILM` (loans to large and mid-sized firms) [S] | Quarterly [S] | 1990 [U] | Yes | FRED API |
-| France | ECB and Banque de France (Bank Lending Survey) | ECB dataset `BLS`, France key to confirm [U] | Quarterly | 2003 [U] | No | ECB API |
-| European Union | **Not available for all 27**: the ECB survey covers only member states using the euro [U] | ECB `BLS`, total for the member states using the euro [U] | Quarterly | 2003 [U] | No | ECB API |
+| United States | Federal Reserve (Senior Loan Officer Survey), via FRED | `DRTSCILM` (loans to large and mid-sized firms) [V] | Quarterly [V] | 1990 Q2 [V] | Yes | FRED API |
+| France | ECB (Bank Lending Survey; the French part is run by the Banque de France [U]) | ECB `BLS`, key `Q.FR.ALL.O.E.Z.B3.ST.S.FNET` (credit standards for loans to firms, net percentage) [V] | Quarterly [V] | 2003 Q1 [V] | No | ECB API (no key) [V] |
+| European Union | **Not available for all 27**: the survey covers only member states using the euro [V] | ECB `BLS`, key `Q.U2.ALL.O.E.Z.B3.ST.S.WFNET` (weighted net percentage) [V] | Quarterly [V] | 2003 Q1 [V] | No | ECB API [V] |
+
+The French figure is a plain net percentage (`FNET`), the total for the
+member states using the euro a weighted one (`WFNET`) [V].
+
+Industry breakdown: none (the survey splits by borrower, firms or
+households, not by industry).
 
 #### 18. Financial stress index
 
@@ -410,13 +552,17 @@ trading. An AI investment boom that turns to bust would show here first.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | ECB (CISS for the US) [S]; or St. Louis Fed, via FRED | ECB `CISS`, US key to confirm [U]; FRED `STLFSI4` [U] | Daily (ECB) [S]; weekly (FRED) [U] | 1980 (ECB) [U]; 1993 (FRED) [U] | Yes | ECB API; FRED API |
-| France | ECB | `CISS`, version for France: existence to confirm [U] | Weekly or daily [U] | Unconfirmed | Unconfirmed | ECB API |
-| European Union | **Not available for all 27**: the ECB's main CISS covers member states using the euro [S] | `CISS`, key to confirm [U] | Daily [S] | 1980 [U] | Yes [U] | ECB API |
+| United States | ECB ("new CISS" for the US) [V]; or St. Louis Fed, via FRED | ECB `CISS`, key `D.US.Z0Z.4F.EC.SS_CIN.IDX` [V]; FRED `STLFSI4` [V] | Daily (ECB) [V]; weekly (FRED) [V] | 2 January 1980 (ECB) [V]; 31 December 1993 (FRED) [V] | Yes | ECB API; FRED API |
+| France | ECB | `CISS`, key `D.FR.Z0Z.4F.EC.SS_CIN.IDX` [V] | Daily [V] | 2 January 1980 [V] | Yes | ECB API |
+| European Union | **Not available for all 27**: covers the member states using the euro [V] | `CISS`, key `D.U2.Z0Z.4F.EC.SS_CIN.IDX` [V] | Daily [V] | 3 January 1980 [V] | Yes | ECB API |
 
+**Correction:** a French version exists [V]. Use the "new CISS" (`SS_CIN`):
+the older version (`SS_CI`) stopped in May 2025 [V].
 Source: [ECB working paper 1426 on the CISS](https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp1426.pdf) [S].
 Corporate bond spreads (for example ICE BofA on FRED) were rejected: the data
 owner limits how much history FRED may show [U].
+
+Industry breakdown: none.
 
 #### 19. Household loan arrears
 
@@ -428,44 +574,65 @@ causes job losses, households fall behind on payments.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Federal Reserve, via FRED | `DRCCLACBS` (credit cards) [U] | Quarterly | 1991 [U] | Yes | FRED API |
-| France | Banque de France (household over-indebtedness cases) | Webstat code to confirm [U] | Monthly or quarterly [U] | Unconfirmed | Unconfirmed | Webstat API [U] |
-| European Union | **Much poorer**: no comparable household arrears figure for all 27 was found [U] | — | — | — | — | — |
+| United States | Federal Reserve, via FRED | `DRCCLACBS` (credit cards, all commercial banks, seasonally adjusted) [V] | Quarterly [V] | 1991 Q1 [V] | Yes | FRED API |
+| France | **Missing, labelled on the Dashboard** (decision 1): no quarterly or monthly figure without the Banque de France | — | — | — | — | — |
+| European Union | **Missing, labelled on the Dashboard**: no quarterly or monthly figure for all 27 | — | — | — | — | — |
+
+**Correction:** a yearly figure does exist for both France and the European
+Union [V]: Eurostat's survey of household living conditions,
+`ilc_mdes08` ("arrears on hire purchase instalments or other loan
+payments", % of the population), France from 2004, EU from 2010. It is
+yearly and published late, so it shows the level, not early movement. See
+[Open questions](#open-questions-for-the-owner).
+
+Industry breakdown: none.
 
 ### Family 5: AI investment and technological adoption
 
 #### 20. Hyperscaler capital spending
 
-Money spent on data centres, servers and chips by the five largest cloud and
-AI companies (Microsoft, Alphabet, Amazon, Meta, Oracle). It is the clearest
-measure of how much is being bet on AI. Details in
-[Hyperscaler capital spending](#hyperscaler-capital-spending).
+Money spent on data centres, servers and chips by the largest cloud and AI
+infrastructure companies: Microsoft, Alphabet, Amazon, Meta, Oracle,
+CoreWeave and Nvidia. It is the clearest measure of how much is being bet on
+AI. Details in [Hyperscaler capital spending](#hyperscaler-capital-spending).
 
 - Core family: AI investment and technological adoption
 - **Leading**
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Company filings to the SEC (EDGAR) | XBRL tag per company, e.g. `PaymentsToAcquirePropertyPlantAndEquipment` [U] | Quarterly | About 2009 in machine-readable form [U] | No | SEC EDGAR API (no key) |
+| United States | Company filings to the SEC (EDGAR) | XBRL tag per company: `PaymentsToAcquirePropertyPlantAndEquipment` (five companies) or `PaymentsToAcquireProductiveAssets` (Amazon, Nvidia) [V] | Quarterly [V] | 2007 to 2013 depending on the company; CoreWeave 2023 [V] | No | SEC EDGAR API (no key) [V] |
 | France | **Not applicable**: these companies are American and report worldwide totals | — | — | — | — | — |
 | European Union | **Not applicable**, same reason | — | — | — | — | — |
 
 Shown as one worldwide Indicator, labelled as not tied to a Region.
 
+Industry breakdown: not applicable; the breakdown is by company.
+
 #### 21. Business investment in IT equipment and software
 
-What all firms spend on computers, communication equipment and software,
+What firms spend on computers, communication equipment and software,
 corrected for price changes. It measures AI investment across the whole
-economy, not only five companies, and goes back to the Internet wave.
+economy, not only a few companies, and goes back to the Internet wave.
 
 - Core family: AI investment and technological adoption
 - **Leading**
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BEA (national accounts table 5.3.6, real private fixed investment), via FRED | Lines "information processing equipment" and "software"; FRED codes to confirm [U] | Quarterly | 1947 [U] | Yes | FRED API or BEA API |
-| France | Eurostat (investment by asset) | `namq_10_an6`, geo `FR`, ICT equipment and intellectual property products [U]; yearly `nama_10_an6` has "computer software and databases" [U] | Quarterly / yearly | 1995 [U] | No | Eurostat API |
-| European Union | Eurostat | Same codes, `EU27_2020` [U] | Quarterly / yearly | 1995 [U] | No | Eurostat API |
+| United States | BEA (national accounts table 5.3.3, real private fixed investment, quantity indexes), via FRED | `Y034RA3Q086SBEA` (information processing equipment) and `B985RA3Q086SBEA` (software), index 2017 = 100 [V] | Quarterly [V] | 1947 Q1 (equipment) [V]; 1959 Q1 (software) [V] | Yes | FRED API |
+| France | Eurostat (investment by asset) | Quarterly: `namq_10_an6`, `N117G` (intellectual property products, which include software and research), `CLV20_MEUR`, `SCA` [V]. Yearly: `nama_10_an6`, `N1132G` (ICT equipment) [V] | Quarterly / yearly | 1980 Q1 (quarterly) [V]; 1975 (yearly) [V] | Yes | Eurostat API |
+| European Union | Eurostat | Same codes, `EU27_2020` [V] | Quarterly / yearly | 1995 [V] | No | Eurostat API |
+
+**Corrections:** FRED's figures in chained dollars (`Y034RX1Q020SBEA`,
+`B985RX1Q020SBEA`) start only in 2007, so the quantity indexes above are
+used [V]. Eurostat publishes **no quarterly ICT-equipment figure** for France
+or the EU total, and **no separate software figure** at all: the yearly
+dataset has ICT equipment, and the quarterly one has only intellectual
+property products [V]. Eurostat's figures cover the whole economy, including
+government; the US figure covers private firms only [V].
+
+Industry breakdown: none (the breakdown is by type of asset).
 
 #### 22. Share of firms using AI
 
@@ -477,18 +644,22 @@ spread beyond the tech industry.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Census Bureau (Business Trends and Outlook Survey, BTOS) | AI use rate [S] | Every two weeks [S] | September 2023 [S] | No | Downloadable files; API to confirm [U] |
-| France | Eurostat (ICT usage in enterprises survey) | `isoc_eb_ai`, geo `FR` [S] | Yearly (2021, then from 2023) [S] | 2021 [S] | No | Eurostat API |
-| European Union | Eurostat | `isoc_eb_ai`, `EU27_2020` [S]; 20% of firms with 10+ employees in 2025 [S] | Yearly [S] | 2021 [S] | No | Eurostat API |
+| United States | Census Bureau (Business Trends and Outlook Survey, BTOS) | AI use rate [V] | Every two weeks [V] | September 2023 [V] | No | Downloadable files; not in the Census API catalogue [V] |
+| France | Eurostat (ICT usage in enterprises survey) | `isoc_eb_ai`, geo `FR`, `E_AI_TANY`, firms with 10 or more people `GE10`, unit `PC_ENT` [V] | Yearly (2021, then from 2023) [V] | 2021 [V] | No | Eurostat API |
+| European Union | Eurostat | `isoc_eb_ai`, `EU27_2020`, same options [V]; 20% of firms with 10+ people in 2025 (19.95%) [V] | Yearly [V] | 2021 [V] | No | Eurostat API |
 
-Notes: the US question was reworded in November 2025, from AI use "in
+Notes: the US question was reworded on 17 November 2025, from AI use "in
 producing goods or services" to use "in any business function". Values
-before and after are **not comparable** [S]
-([Census research note](https://www.census.gov/newsroom/blogs/research-matters/2024/12/ai-use-small-businesses.html),
-[Census 2026 story](https://census.gov/library/stories/2026/05/ai-use-businesses.html)).
+before and after are **not comparable** [V]
+([Census 2026 story](https://www.census.gov/library/stories/2026/05/ai-use-businesses.html),
+[Census research note](https://www.census.gov/newsroom/blogs/research-matters/2024/12/ai-use-small-businesses.html)).
 The US and EU surveys ask different questions and cover different firm sizes;
 compare directions only. Eurostat source:
-[Eurostat news, 11 December 2025](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251211-2) [S].
+[Eurostat news, 11 December 2025](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251211-2) [V].
+
+Industry breakdown: United States, by sector (in May 2026, 39.7% in
+information against 19.8% nationally) [V]; France and European Union,
+`isoc_eb_ain2`, by NACE industry [V].
 
 #### 23. Data-centre construction spending
 
@@ -501,9 +672,13 @@ electricity).
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | Census Bureau (construction spending) | Private data-centre line, now shown apart from offices [S]; code to confirm [U] | Monthly [S] | Start date of the separate line unconfirmed [U] | No | Census API [U] |
+| United States | Census Bureau (construction spending) | Column "Data center" in the file `privsatime.xlsx` (private construction, seasonally adjusted annual rate, millions of dollars); data centres are part of "Office" [V] | Monthly [V] | January 2014 [V] | No | File download, no key [V]; the Census API needs a key and its data-centre content was not checked [U] |
 | France | **Not available** | — | — | — | — | — |
 | European Union | **Not available** | — | — | — | — | — |
+
+Source: [Census construction spending](https://www.census.gov/construction/c30/c30index.html) [V].
+
+Industry breakdown: not applicable.
 
 #### 24. Output of the information and communication industry
 
@@ -516,9 +691,33 @@ grows without hiring.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | BEA (GDP by industry), via FRED or BEA API | Real value added, Information; code to confirm [U] | Quarterly | 2005 quarterly [U]; 1947 yearly [U] | Yes (yearly) [U] | FRED API or BEA API |
-| France | Eurostat | `namq_10_a10`, NACE `J`, chain-linked volumes, `FR` [U] | Quarterly | 1995 [U] | No | Eurostat API |
-| European Union | Eurostat | Same, `EU27_2020` [U] | Quarterly | 1995 [U] | No | Eurostat API |
+| United States | BEA (GDP by industry), via FRED | `RVAI` (real value added, information) [V] | Quarterly [V] | 2005 Q1 [V]; yearly back to 1947 [U] | No (quarterly) | FRED API |
+| France | Eurostat | `namq_10_a10`, NACE `J`, `B1G`, `CLV20_MEUR`, `SCA`, geo `FR` [V] | Quarterly [V] | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | Eurostat | Same, `EU27_2020` [V] | Quarterly [V] | 1995 Q1 [V] | No | Eurostat API |
+
+Industry breakdown: this Indicator is itself one industry.
+
+#### 25. Revenue of AI model companies
+
+Revenue of the companies that build and sell AI models. It measures how much
+firms and people actually pay to use AI, which the adoption surveys
+(Indicator 22) only ask about.
+
+- Core family: AI investment and technological adoption
+- **Leading**: money spent on AI models shows adoption being paid for,
+  before its effects reach jobs, pay and spending. It moves at the same time
+  as the AI industry itself, but for Spock's question (consequences for the
+  economy) it comes first.
+
+| Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
+| --- | --- | --- | --- | --- | --- | --- |
+| United States (US-listed companies) | Company filings to the SEC (EDGAR) | Anthropic, PBC, CIK `2130357` [V]: no machine-readable revenue yet [V] | Quarterly, from its first quarterly report (10-Q) | 2023, from the prospectus [V] | No | SEC EDGAR API (no key) [V] |
+| France | **Not available**: no listed French AI model company | — | — | — | — | — |
+| European Union | **Not available**: no listed EU equivalent | — | — | — | — | — |
+
+Details in [Revenue of AI model companies](#revenue-of-ai-model-companies).
+
+Industry breakdown: not applicable; the breakdown is by company.
 
 ## AI-exposed occupations
 
@@ -528,10 +727,10 @@ This is where the three Regions differ most.
 
 | Occupation | US code (SOC 2018) | International code (ISCO-08) | Usable at Eurostat? |
 | --- | --- | --- | --- |
-| Administrative work | `43-0000` Office and administrative support [U] | `41` General and keyboard clerks [U] | Yes, two-digit [S] |
-| Customer support | `43-4051` Customer service representatives [U] | `42` Customer services clerks [U] | Yes, two-digit [S] |
-| Translation | `27-3091` Interpreters and translators [U] | `2643` Translators, interpreters and other linguists [U] | **No**: inside `26`, which also holds lawyers, artists and others [U] |
-| Software development | `15-1252` Software developers [U] | `25` ICT professionals (includes `2512` software developers) [U] | Yes, but only as all ICT professionals [U] |
+| Administrative work | `43-0000` Office and administrative support [U] | `OC41` General and keyboard clerks [V] | Yes, two-digit [V] |
+| Customer support | `43-4051` Customer service representatives [U] | `OC42` Customer services clerks [V] | Yes, two-digit [V] |
+| Translation | `27-3091` Interpreters and translators [U] | `2643` Translators, interpreters and other linguists [U] | **No**: inside `OC26` "Legal, social and cultural professionals" [V], which also holds lawyers, artists and others |
+| Software development | `15-1252` Software developers [U] | `OC25` Information and communications technology professionals (includes `2512` software developers [U]) [V] | Yes, but only as all ICT professionals [V] |
 
 ### United States
 
@@ -540,8 +739,10 @@ This is where the three Regions differ most.
   1997 [S]. Classification changes in 1999, 2010 and 2018 break comparisons
   over time [S]
   ([BLS OEWS history](https://www.bls.gov/opub/hom/oews/history.htm)).
-  Published about a year after the reference date [U]. The BLS API carries
-  only the latest year; history comes from yearly files [U].
+  Published about a year after the reference date [U]. The BLS API seems to
+  carry only the latest year: in the one answer received, it had no values
+  for 2023 or 2024 for national office and administrative support [U]. The
+  BLS website and API were blocked for the rest of this check.
 - **CPS** (Current Population Survey, the household survey behind the
   unemployment rate): monthly, but BLS publishes employment by detailed
   occupation as yearly averages; monthly occupation detail needs the raw
@@ -549,29 +750,19 @@ This is where the three Regions differ most.
 - **JOLTS** (job openings): monthly, but **no occupation detail**, only
   industries and US census regions [S].
 
-### France
-
-- **France Travail BMO** (hiring-plans survey, *Besoins en main-d'œuvre*):
-  once a year, planned hiring by job family (FAP2021), including how many
-  are hard to fill. The 2026 edition surveyed 416,588 workplaces from October
-  to December 2025 and counted about 2.28 million planned hires [S]. Open
-  data on data.gouv.fr, but the files lack documentation and use non-standard
-  formats [S]
-  ([data.gouv.fr BMO](https://www.data.gouv.fr/datasets/enquete-besoins-en-main-doeuvre-bmo)).
-- **Job seekers and job offers by occupation** (France Travail and DARES, by
-  ROME code): quarterly [U]. This could be the most frequent French
-  occupation figure, but it was not verified.
-- **Labour Force Survey** (INSEE), by PCS or FAP: yearly [U]; also reported
-  to Eurostat as `lfsa_egai2d` [S].
-
-### European Union
+### France and the European Union
 
 - **Eurostat Labour Force Survey** `lfsa_egai2d`: employment by ISCO-08
-  two-digit occupation, yearly, from 2011 [S]. Quarterly data exists only
-  at the one-digit level (e.g. all "clerical support workers") [S]. This is
-  the same source for France and the EU, so the two are comparable.
-- **Eurostat job vacancies by occupation** (`jvs_q_isco_r2`) exists [S], but
-  many member states do not report it [U].
+  two-digit occupation, yearly, 2011 to 2025, for France and the EU total
+  [V]. Quarterly data exists only at the one-digit level (for example all
+  "clerical support workers"), in `lfsq_egais`, from 1998 [V for the
+  dataset's dates; its France coverage was not checked, U]. This is the same
+  source for France and the EU, so the two are comparable.
+- **Eurostat job vacancies by occupation**: `jvs_q_isco_r2` was closed at the
+  end of 2025; its replacement is `jvs_q_isco_r21` [V]. Many member states do
+  not report occupations [U].
+- France's own sources (France Travail's hiring-plans survey, job seekers by
+  occupation) are listed under [Later additions](#later-additions).
 
 ### What this means for Spock
 
@@ -585,207 +776,449 @@ This is where the three Regions differ most.
 ## Hyperscaler capital spending
 
 Hyperscalers report capital spending in their quarterly and yearly filings
-to the SEC (the US financial regulator). Since about 2009, these filings
-carry machine-readable tags (called XBRL) that the SEC republishes for free
-[U].
+to the SEC (the US financial regulator). These filings carry machine-readable
+tags (called XBRL) that the SEC republishes for free [V].
 
 - **Where:** the SEC's free EDGAR API on `data.sec.gov`. It offers, per
   company, all reported figures (`companyfacts`) or one figure over time
-  (`companyconcept`), as JSON (a structured text format programs read) [S]
+  (`companyconcept`), as JSON (a structured text format programs read) [V]
   ([SEC: Accessing EDGAR data](https://www.sec.gov/os/accessing-edgar-data)).
-- **No key**, but **conditions**: at most 10 requests per second, and every
-  request must declare who sends it in a "User-Agent" header, the SEC's
-  example being a company name and an administrator's email [S]
-  ([SEC developer resources](https://www.sec.gov/developer)). The SEC may
-  block senders who ignore these conditions [S]. Spock needs only a handful of
-  requests a day, far below the limit.
-- **Companies and identifiers** (the SEC's company number, called CIK):
-  Microsoft `0000789019` [U], Alphabet `0001652044` [U], Amazon `0001018724`
-  [S], Meta `0001326801` [U], Oracle `0001341439` [U].
-- **Which figure:** "purchases of property and equipment" in the cash-flow
-  statement. Most of these companies tag it
-  `PaymentsToAcquirePropertyPlantAndEquipment`; Amazon's tag could not be
-  confirmed [U]. The first build must read each company's latest filing to
-  confirm the tag.
+- **No key**, but **conditions**: at most 10 requests per second, and
+  requests must declare who sends them in a "User-Agent" header (a line each
+  request carries to say who is calling) [V, from the SEC's refusal page].
+  The SEC may limit senders who ignore these conditions [V]. Spock needs only
+  a handful of requests a day, far below the limit. Spock will declare the
+  Owner's personal email, stored as a private setting, never in this
+  repository (decision 3).
+- **Companies, identifiers and tags** (CIK is the SEC's company number). All
+  checked in each company's `companyfacts` on 2026-11-19 [V]:
+
+| Company | CIK | Year ends | Tag for "purchases of property and equipment" | Machine-readable since | Latest full year |
+| --- | --- | --- | --- | --- | --- |
+| Microsoft | `789019` | June | `PaymentsToAcquirePropertyPlantAndEquipment` | 2008 | $115.9 bn (year to June 2026) |
+| Alphabet | `1652044` | December | `PaymentsToAcquirePropertyPlantAndEquipment` | 2013 | $91.4 bn (2025) |
+| Amazon | `1018724` | December | `PaymentsToAcquireProductiveAssets` (the other tag stops in early 2017) | 2007 | $131.8 bn (2025) |
+| Meta | `1326801` | December | `PaymentsToAcquirePropertyPlantAndEquipment` | 2010 | $69.7 bn (2025) |
+| Oracle | `1341439` | May | `PaymentsToAcquirePropertyPlantAndEquipment` | 2010 | $55.7 bn (year to May 2026) |
+| CoreWeave | `1769628` | December | `PaymentsToAcquirePropertyPlantAndEquipment` | 2023 | $10.309 bn (2025) |
+| Nvidia | `1045810` | late January | `PaymentsToAcquireProductiveAssets` (the other tag stops in mid-2020) | 2019 for this tag | $6.0 bn (year to January 2026) |
+
 - **Traps to handle:**
-  - Quarterly filings report the year so far, not the quarter alone; the
-    quarter must be computed by subtraction [U].
-  - Microsoft's year ends in June and Oracle's in May, so "Q1" means
-    different months [U].
+  - Quarterly filings report the year so far; some companies (Microsoft,
+    Amazon) also give the quarter alone, others (Nvidia, CoreWeave) do not,
+    so the quarter must then be computed by subtraction [V].
+  - Microsoft's year ends in June, Oracle's in May and Nvidia's in late
+    January, so "Q1" means different months [V].
+  - `PaymentsToAcquireProductiveAssets` also includes software and other
+    intangible assets, per the tag's official definition [V]; Amazon's and
+    Nvidia's figures are therefore slightly broader.
+  - Alphabet's figures before 2015 are filed under Google's former company
+    number, not checked here [U].
   - Some spending is through leases and does not appear in this line [U].
   - The figure covers all buildings and equipment, not only AI.
-- **History:** machine-readable from about 2009 only [U], so this Indicator
-  cannot be compared with the Internet wave. Indicator 21 (IT investment)
-  covers that.
+- **Known difficulty: Nvidia's data-centre revenue.** Nvidia's sales to data
+  centres are the best single measure of AI chip demand, but they are a
+  segment figure, and the SEC's `companyfacts` holds no figures split by
+  segment. Getting them would mean reading each filing separately. Not part
+  of the starter list.
+- **History:** machine-readable from 2007 to 2013 depending on the company
+  [V], so this Indicator cannot be compared with the Internet wave.
+  Indicator 21 (IT investment) covers that.
+
+### Revenue of AI model companies
+
+- **Anthropic, PBC**: CIK `2130357`, ticker `ANT`, year ending in December
+  [V]. Its final prospectus (form 424B4) was filed on 2026-11-19 under
+  accession number `0001628280-26-074944` [V]. The prospectus gives an
+  initial price of $83.00 a share and a listing on the Nasdaq Global Select
+  Market under the symbol `ANT` [V]. The first trading day (2026-11-19) comes
+  from news reports [S].
+- **No machine-readable figures yet.** Anthropic's `companyfacts` holds only
+  filing-fee data, no accounting figures [V]. They should arrive with its
+  first quarterly report (10-Q).
+- **From the prospectus** [V]:
+  - **total revenue** was $41 million (2023), $386 million (2024) and
+    $4.6 billion (2025); for the nine months to 2026-09-30 it was
+    $33.2 billion, against $2.5 billion a year earlier. The company warns it
+    does not expect such growth rates to continue;
+  - revenue from customers paying $100,000 or more over twelve months grew
+    from about $37 million (2023) to $220 million (2024), $3.5 billion (2025)
+    and $26.1 billion (twelve months to 2026-09-30);
+  - purchases of property and equipment were small: $2 million, $15 million
+    and $131 million for 2023 to 2025, and $925 million for the nine months
+    to 2026-09-30, plus $1,955 million of prepayments for leased assets.
+- **Not added to capital spending.** Anthropic mostly rents its computing
+  power from cloud companies already in Indicator 20; adding its own small
+  spending would count the same money twice.
+- **OpenAI**: add it if and when it becomes a listed company.
+- **Limits:** US-listed companies only; no French or EU equivalent exists.
+  History starts in 2023.
 
 ## Watched relationships
 
-Nine proposals. Each checks for a Divergence (two Indicators that normally
+Eight proposals. Each checks for a Divergence (two Indicators that normally
 move together drifting apart) or a Pattern (several Indicators pointing the
 same way at the same time).
 
 | # | Indicators | Kind | Plain-English question | What it would mean |
 | --- | --- | --- | --- | --- |
-| W1 | 7 Productivity; 8 Real compensation per hour | Divergence | Are workers getting their share of AI's productivity gains? | Productivity rising while real pay stays flat: AI's gains go elsewhere. |
-| W2 | 7 Productivity; 9 Labour share; 10 Inequality | Pattern | Do AI's gains go to capital rather than workers? | Productivity up, labour share down, inequality up at the same time. |
-| W3 | 20 Hyperscaler spending; 21 IT investment; 22 Firms using AI; 5 Employment in AI-exposed occupations | Pattern | Is AI investment replacing the jobs it targets? | Investment and adoption rising while employment in exposed occupations falls. |
-| W4 | 24 Output of information industry; 6 Employment in information and professional services | Divergence | Is the tech industry growing without hiring? | Output rising while employment stalls or falls. |
-| W5 | 4 Youth unemployment; 1 Unemployment rate | Divergence | Are young people hit first? | Youth unemployment rising while the overall rate stays stable. |
-| W6 | 3 Job openings; 1 Unemployment rate | Divergence | Are employers hiring less without laying off yet? | Openings falling while unemployment stays low; or both rising, meaning jobs on offer no longer match the people looking. |
-| W7 | 14 Confidence and unemployment fears; 13 Saving rate; 12 Real consumption; 11 Real disposable income | Pattern | Are households getting worried and cutting back? | Fear of unemployment and saving up, spending down, possibly before income falls. |
-| W8 | 17 Lending standards; 18 Financial stress; 15 Business failures; 19 Household arrears | Pattern | Is the financial system turning against firms and households? | Tighter credit and higher stress, followed by more failures and arrears. |
-| W9 | 22 Firms using AI; 21 IT investment; 7 Productivity, compared across the three Regions | Divergence | Is AI adoption showing up in productivity, and where first? | One Region adopting and investing faster and pulling ahead in productivity, as the United States did during the Internet wave [U]; or adoption rising everywhere with no productivity gain anywhere. |
+| W1 | Headline: 7 Productivity against 8 Real compensation per hour. Supporting: 9 Labour share, 10 Inequality | Divergence (with supporting Indicators) | Are workers getting their share of AI's gains? | Productivity rising while real pay stays flat; labour share falling and inequality rising at the same time confirm that AI's gains go to capital rather than workers. |
+| W2 | 20 Hyperscaler spending; 21 IT investment; 22 Firms using AI; 25 Revenue of AI model companies; 5 Employment in AI-exposed occupations | Pattern | Is AI investment replacing the jobs it targets? | Investment, adoption and spending on AI models rising while employment in exposed occupations falls. |
+| W3 | 24 Output of information industry; 6 Employment in information and professional services | Divergence | Is the tech industry growing without hiring? | Output rising while employment stalls or falls. |
+| W4 | 4 Youth unemployment; 1 Unemployment rate | Divergence | Are young people hit first? | Youth unemployment rising while the overall rate stays stable. |
+| W5 | 3 Job openings; 1 Unemployment rate | Divergence | Are employers hiring less without laying off yet? | Openings falling while unemployment stays low; or both rising, meaning jobs on offer no longer match the people looking. |
+| W6 | 14 Confidence and unemployment fears; 13 Saving rate; 12 Real consumption; 11 Real disposable income | Pattern | Are households getting worried and cutting back? | Fear of unemployment and saving up, spending down, possibly before income falls. |
+| W7 | 17 Lending standards; 18 Financial stress; 15 Business failures; 19 Household arrears | Pattern | Is the financial system turning against firms and households? | Tighter credit and higher stress, followed by more failures and arrears. |
+| W8 | 22 Firms using AI; 21 IT investment; 7 Productivity, compared across the three Regions | Divergence | Is AI adoption showing up in productivity, and where first? | One Region adopting and investing faster and pulling ahead in productivity, as the United States did during the Internet wave [U]; or adoption rising everywhere with no productivity gain anywhere. |
 
-W1, W2, W5, W6 and W8 can be compared with the Internet wave in the United
-States; most French and EU data starts in 1995 or later.
+W1 merges the first pass's W1 and W2 (decision 8). Revenue of AI model
+companies (25) joins W2: it is the most direct measure of AI being paid for.
+
+W1, W4, W5, W6 and W7 can be compared with the Internet wave in the United
+States, and W1 (without labour share and inequality), W4, W5 and W6 also in
+France, since Eurostat's French figures start in 1980 to 1985. The EU total
+mostly starts in 1995 to 2000.
+
+### Indicators not yet in a Watched relationship
+
+Decision 10 says every Indicator must appear in at least one Watched
+relationship. Three do not yet: **2 Total employment**, **16 New business
+creations** and **23 Data-centre construction spending**. Proposed homes,
+for the Owner to approve (see
+[Open questions](#open-questions-for-the-owner)):
+
+- 2 Total employment in **W3**, as the economy-wide yardstick: employment in
+  information and professional services (6) as a share of total employment
+  (2).
+- 16 New business creations in **W7**: creations falling while failures rise
+  is the same strain on firms seen from the other side.
+- 23 Data-centre construction in **W2**, next to the other AI investment
+  Indicators.
+
+### How Watched relationships are calculated
+
+Two Indicators measured in different units (an index, a rate, a number of
+people) cannot be compared directly. Spock first puts them on the same
+footing, in one of two ways:
+
+- **12-month growth rates**: each Indicator's change over the past year, in
+  per cent.
+- **Indexes = 100 at a common start**: each Indicator divided by its own
+  value at the same starting date, times 100. Both then start at 100 and
+  show how far each has moved since.
+
+For a pair, Spock then follows one number, the **ratio of the two indexes**.
+For W1, it is the productivity index divided by the real pay index: 100
+means both moved alike since the start; 120 means productivity has gained
+20% more than real pay. For W5, it is **job openings per unemployed person**
+(job openings divided by the number of unemployed people, which both
+publishers give alongside the rate: FRED `UNEMPLOY` from 1948 [V], Eurostat
+`une_rt_m` unit `THS_PER` [V]). For the EU total, Eurostat publishes only a
+vacancy rate, not a count [V], so W5 uses the vacancy rate divided by the
+unemployment rate there.
+
+**When a Divergence is flagged** (decision 9, option A): the distance
+between the two Indicators is wider than in 95% of its own history, and stays
+so for two releases in a row. "Its own history" means all past values of
+that same pair in that Region. The two-releases condition avoids flagging a
+single odd value.
+
+**When a Pattern is flagged:** each Indicator is judged against its own
+history, the same way; the Pattern fires when all of them (or a number the
+Owner agrees per Pattern) point the worrying way at the same time.
+
+**Later option (C):** the Owner sets a threshold for a given Watched
+relationship, which then replaces the default above for that one.
+
+These are fixed, written-down rules, as ADR 0001 requires: Spock flags; the
+Owner explains, in an Insight.
+
+### Industry detail
+
+Decided by the Owner (decision 10, option A):
+
+- **Totals answer "how much", breakdowns answer "where", and Watched
+  relationships point to the "why"**, which the Owner explains in an
+  Insight.
+- Indicators without an industry breakdown are kept, provided each appears
+  in at least one Watched relationship (three need a home: see above).
+- Wherever a breakdown exists, the Dashboard shows it: employment (2 and 6),
+  job openings (3), business failures (15), business creations (16), and
+  also unemployment (US only), firms using AI (22) and, if computed, real
+  pay by industry (8). Each Indicator above has a line "Industry breakdown:"
+  saying what exists in each Region.
+- **NACE version change:** Eurostat's job vacancies already use NACE
+  version 2.1, while national accounts and business registrations still use
+  version 2 [V]. Some section letters differ (in version 2.1, IT services are
+  in section K; in version 2, they are in J) [V]. Spock must map them
+  explicitly and not match letters blindly.
+
+### Dashboards
+
+Decided by the Owner on 2026-11-19 and recorded in
+[ADR 0004](../adr/0004-arrange-data-to-make-sense.md):
+
+- **The principle, Spock's moat:** Spock doesn't just throw data at the
+  people looking at it; it arranges it in ways that help them make sense of
+  it.
+- **Signals dashboard** (the main one): shows the Watched relationships.
+- **Data dashboard** (the secondary one): shows the Indicators by Core
+  family, for exploring them one by one.
+
+**Proposed grouping for the Signals dashboard** (to confirm when the screens
+are designed). The sections follow an AI shock through the economy, from
+early signs to late consequences, with a one-line summary of each section
+at the top:
+
+| Section | Question | Watched relationships |
+| --- | --- | --- |
+| 1. Is AI arriving? | Are firms investing in AI and using it, and does it raise productivity? | W8 |
+| 2. Is AI replacing work? | Are jobs disappearing where AI hits first? | W2, W3, W4, W5 |
+| 3. Who gets the gains? | Do the gains go to workers or to capital? | W1 |
+| 4. Are households and firms paying the price? | Is the damage spreading to spending, credit and failures? | W6, W7 |
+
+An Indicator can appear in more than one section.
+
+### Charts
+
+Decided by the Owner (decision 11):
+
+- **Charts over time are the default**, with the Historical episodes (the
+  Internet wave, the Global financial crisis, the Covid shock) shaded in the
+  background.
+- **Combinations of Watched relationships are a later idea.** When they
+  come, they will be defined as named Patterns. Explaining what a
+  combination means stays the Owner's work, in an Insight (ADR 0001).
 
 ## Keys, registration and usage limits
 
 | Publisher | Key needed? | How to get it | Usage limits | Notes |
 | --- | --- | --- | --- | --- |
-| FRED (St. Louis Fed) | **Yes**, free | Account on the FRED website, then request an API key [U] | 120 requests per minute is widely reported, but the official page could not be read [U] | Covers most US Indicators, so the most important key. FRED asks for attribution [U]. Some data on FRED belongs to third parties (University of Michigan) with their own terms [U]. |
-| BLS | **Yes** for version 2, free | Form at `data.bls.gov/registrationEngine`; key arrives by email [S] | Version 2: 500 requests a day, 50 data feeds per request, 20 years per request; version 1 (no key): 25 a day, 25 feeds, 10 years; both 50 requests per 10 seconds [S] | Must be renewed once a year [S] ([BLS API FAQ](https://www.bls.gov/developers/api_faqs.htm)). Needed only for what FRED lacks (OEWS). |
-| US Census Bureau | **Yes**, free | Sign-up at `api.census.gov/data/key_signup.html` [S] | Officially 500 requests a day without a key [S]; a May 2026 report says a key is now required for every request [U] | Needed for data-centre construction and possibly BTOS. Get the key to be safe. |
-| BEA | Optional, free | Registration on the BEA API site [U] | Not confirmed [U] | Only if FRED lacks a needed BEA line. |
-| SEC EDGAR | **No key** | — | 10 requests per second; declared User-Agent with contact details [S] | The User-Agent needs a contact email: a decision for the Owner (see Open questions). |
-| Eurostat | No key [U] | — | None published [U] | "Open for public use" per Eurostat [S] ([Eurostat API introduction](https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-introduction)). |
-| ECB | No key [U] | — | None published [U] | ([ECB API help](https://data.ecb.europa.eu/help/api/data)) [S]. |
-| INSEE | No key on `bdm.insee.fr` [S]; account needed for the `api.insee.fr` portal [S] | Portal sign-up only if needed | Not confirmed [U] | INSEE's guide says the same paths work on both hosts [S] ([INSEE SDMX guide](https://www.insee.fr/fr/statistiques/fichier/2862759/BDM_serviceweb_SDMX_V2_2_guideutilisation.pdf)). |
-| Banque de France Webstat | **Yes**, free | Sign up on the Webstat developer portal, create an "app", which gives a client ID [S] | Not confirmed [U] | Only for French business failures with history before 2015 and household over-indebtedness. Eurostat covers failures from 2015 without a key. |
-| France Travail BMO, DARES | No key for the files [U] | — | — | Files, not an API; yearly or quarterly download. |
+| FRED (St. Louis Fed) | **Yes**, free: every request needs a key [V] | Log in to a FRED account, then request a key [V] | Up to 120 requests per minute [V] ([FRED API errors page](https://fred.stlouisfed.org/docs/api/fred/errors.html)) | Covers most US Indicators, so the most important key. Spock must show "This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis." [V]. Data owned by third parties (University of Michigan) needs the owner's permission for anything beyond personal use [V] ([FRED API terms](https://fred.stlouisfed.org/docs/api/terms_of_use.html)). |
+| BLS | **Yes** for version 2, free | Form at `data.bls.gov/registrationEngine`; key arrives by email [S] | Version 2: 500 requests a day, 50 data feeds per request, 20 years per request; version 1 (no key): 25 a day, 25 feeds, 10 years; both 50 requests per 10 seconds [S] | Must be renewed once a year [S] ([BLS API FAQ](https://www.bls.gov/developers/api_faqs.htm)). Needed only for what FRED lacks (OEWS). The keyless daily allowance ran out during this check [V], so a key is needed. |
+| US Census Bureau | **Yes**, free: the API refuses requests without a key [V] | Sign-up at `api.census.gov/data/key_signup.html` [S] | Not checked [U] | Today Spock's Census data comes from files (data-centre construction, BTOS) that need no key [V]; the key is for using the API instead. |
+| SEC EDGAR | **No key** [V] | — | 10 requests per second; declared User-Agent with contact details [V] | Contact: the Owner's personal email, stored as a private setting, never in this repository (decision 3). |
+| Eurostat | No key [V] | — | None published [U] | "Open for public use" and "free of charge" per Eurostat [V] ([Eurostat API introduction](https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-introduction)). |
+| ECB | No key [V] | — | None published [U] | Used without a key in this check [V]. |
+| AMECO (European Commission) | No key [V] | — | None published [U] | Web query service on `ec.europa.eu` [V]. |
+| US Courts | No key [V] | — | — | One PDF and one Excel file per quarter [V]; no API. |
+
+Keys dropped since the first pass: INSEE and the Banque de France (decisions
+1 and 4). The BEA key is not needed: every BEA figure used comes through
+FRED [V].
 
 Never paste a key into the chat or an issue (`docs/agents/decisions.md`,
 section 7).
 
 ## Hosts to allow
 
-Two lists: hosts the **daily data collection** must reach, and hosts the
-**next research or build session** must reach to check this note's [U]
-items. Exact API hosts marked [U] should be confirmed when the docs can be
-read.
+Two lists: hosts the **daily data collection** must reach, and hosts a
+**future research or build session** needs to read documentation.
 
 ### Daily data collection
 
 | Host | What for |
 | --- | --- |
-| `api.stlouisfed.org` | FRED API: most US Indicators |
-| `api.bls.gov` | BLS API: OEWS and BLS-only figures |
-| `api.census.gov` | Census API: construction spending, possibly BTOS [U] |
-| `www.census.gov` | BTOS download files [U] |
-| `apps.bea.gov` | BEA API, only if needed [U] |
-| `data.sec.gov` | SEC EDGAR company figures [S] |
-| `www.sec.gov` | SEC list matching companies to CIK numbers [U] |
-| `ec.europa.eu` | Eurostat API (`/eurostat/api/dissemination/...`) [S]; AMECO may also live here [U] |
-| `data-api.ecb.europa.eu` | ECB API: lending survey, CISS [S] |
-| `bdm.insee.fr` | INSEE statistics API without a key [S] |
-| `api.insee.fr` | INSEE API portal, if the keyless host is retired [S] |
-| `webstat.banque-france.fr` | Banque de France Webstat; the exact API host may differ [U] |
-| `www.data.gouv.fr` and `static.data.gouv.fr` | France Travail BMO files [U] |
-| `dares.travail-emploi.gouv.fr` | DARES files (job seekers and vacancies by occupation) [U] |
-| `www.uscourts.gov` | US business bankruptcy tables [U] |
+| `api.stlouisfed.org` | FRED API: most US Indicators [V] |
+| `api.bls.gov` | BLS API: OEWS [V] |
+| `www.census.gov` | Data-centre construction file and BTOS files [V] |
+| `api.census.gov` | Census API, only if the files above are replaced by the API [V] |
+| `data.sec.gov` | SEC EDGAR company figures [V] |
+| `www.sec.gov` | SEC list matching companies to CIK numbers, and filings not yet in machine-readable form [U] |
+| `ec.europa.eu` | Eurostat API (`/eurostat/api/dissemination/...`) and AMECO (`/economy_finance/ameco/...`) [V] |
+| `data-api.ecb.europa.eu` | ECB API: lending survey, CISS [V] |
+| `www.uscourts.gov` | US business bankruptcy tables [V] |
 
-### Documentation, for checking this note
+**Dropped since the first pass**, because nothing in the starter list uses
+them any more: `bdm.insee.fr` and `api.insee.fr` (INSEE, decision 1),
+`webstat.banque-france.fr` (Banque de France, decision 4),
+`www.data.gouv.fr`, `static.data.gouv.fr`, `dares.travail-emploi.gouv.fr`
+and `statistiques.francetravail.org` (France Travail and DARES files: France
+now comes from Eurostat, see [Later additions](#later-additions)), and
+`apps.bea.gov` (BEA figures come through FRED). They can stay allowed in
+the cloud environment for research; the data collection does not need them.
 
-`fred.stlouisfed.org`, `www.bls.gov`, `data.bls.gov`, `www.bea.gov`,
-`www.census.gov`, `www.federalreserve.gov`, `www.insee.fr`,
-`portail-api.insee.fr`, `www.banque-france.fr`,
-`developer.webstat.banque-france.fr`, `data.ecb.europa.eu`,
-`www.ecb.europa.eu`, `economy-finance.ec.europa.eu`, `francetravail.org`,
-`www.sec.gov`.
+### Documentation
+
+`fred.stlouisfed.org` [V], `www.bls.gov` (refuses automated requests, even
+browser-like ones [V]), `www.census.gov` [V], `www.sec.gov` (needs a
+declared contact [V]), `www.insee.fr` [V], `www.ecb.europa.eu`,
+`data.ecb.europa.eu`, `economy-finance.ec.europa.eu` (refused by the network
+in this check [V]).
 
 ## Missing or poorer coverage
 
 These will be shown, labelled, on the Dashboard.
 
-- **Hyperscaler capital spending** (20): worldwide, not split by Region.
-- **Data-centre construction** (23): United States only.
+- **Hyperscaler capital spending** (20) and **revenue of AI model
+  companies** (25): worldwide company totals, not split by Region; US-listed
+  companies only; revenue of AI model companies has no French or EU
+  equivalent and starts in 2023.
+- **Data-centre construction** (23): United States only, from 2014.
 - **Bank lending standards** (17) and **financial stress** (18): France and
   the member states using the euro, not all 27 members of the European
   Union.
-- **Household arrears** (19): no EU-wide figure; French figure unconfirmed.
+- **Household arrears** (19): no quarterly or monthly figure for France or
+  the European Union; a yearly survey figure exists (open question).
 - **AI-exposed occupations** (5): yearly everywhere for easy-to-use data;
   translation cannot be isolated in EU data; history starts in 1997 (US) and
   2011 (France, EU).
 - **Job openings** (3): no occupation detail in any Region at monthly or
-  quarterly frequency without heavy work.
-- **Business failures** (15): EU index only from 2015; US has no API.
+  quarterly frequency without heavy work; France not strictly comparable with
+  other member states; no count for the EU total, only a rate.
+- **Business failures** (15) and **creations** (16) in France and the EU: an
+  index from 2015 only; US failures have no API.
 - **Firms using AI** (22): starts 2021 (EU) and 2023 (US); the US question
   changed in November 2025.
-- **Internet wave comparison**: most French and EU Indicators start in 1995
-  or later; only the US, AMECO and some INSEE data cover 1995 to 2005 with a
-  run-up before it.
-- **Real compensation** (8) and **labour share** (9) for France and the EU:
-  computed by Spock or yearly only.
+- **IT investment** (21) in France and the EU: no quarterly ICT-equipment or
+  software figure; quarterly data covers all intellectual property products.
+- **Internet wave comparison**: France is well covered from 1980 to 1985 for
+  jobs, productivity, pay, household income, saving and confidence; the EU
+  total mostly starts in 1995 to 2000, so the run-up to the Internet wave is
+  missing for it.
+- **Real compensation** (8) for France and the EU: computed by Spock, from
+  1996 (France) and 2000 (EU) because of the price index.
+- **Labour share** (9) for France and the EU: yearly only, and the latest
+  years are forecasts.
+
+## Later additions
+
+Not part of the starter list; recorded so they are not lost.
+
+- **INSEE** (decision 1). Eurostat already gives France from 1980 to 1985
+  for most Indicators [V], so INSEE would mainly add: French history before
+  1980 (unemployment, household accounts, labour share [U]); monthly French
+  figures Eurostat does not have, such as household consumption of goods
+  [U] and business creations as counts rather than an index [U]; INSEE's own
+  consumer confidence survey, from January 1987 [S]; and a longer French
+  inequality figure from tax data [U]. Hosts: `bdm.insee.fr` (no key [S]) or
+  `api.insee.fr` (account [S]).
+- **Banque de France account** (decision 4). It would add French business
+  failures as counts back to December 1991, revised monthly as court records
+  arrive [S], and household over-indebtedness cases, the closest French
+  stand-in for household arrears [U]. Needs a free Webstat developer account
+  [S].
+- **France Travail and DARES**: the yearly hiring-plans survey (BMO, planned
+  hires by job family, about 2.28 million planned hires in the 2026 edition
+  [S]) and quarterly job seekers and job offers by occupation [U]. Left out
+  because the files are poorly documented [S], have no EU equivalent, and
+  Eurostat gives a comparable French occupation figure.
+- **Nvidia's data-centre revenue**: needs reading each filing (see
+  [Hyperscaler capital spending](#hyperscaler-capital-spending)).
+- **OpenAI**: add to Indicator 25 if it becomes a listed company.
+- **AI-exposed software firms** (decision 7): Adobe (CIK `796343`, ticker
+  `ADBE` [V]) and Figma (CIK `1579878`, ticker `FIG` [V]). These ask a
+  different question, at company level: are firms whose products AI can
+  replace losing ground? They are not AI infrastructure spending.
+- **Owner-set thresholds** per Watched relationship (option C of decision
+  9).
+- **Combinations of Watched relationships**, as named Patterns (decision 11).
+
+## Decisions by the Owner (2026-11-19)
+
+Approved by the Owner on 2026-11-19, answering the first pass's open
+questions.
+
+1. **France: Eurostat by default.** INSEE is dropped as a source for now (see
+   [Later additions](#later-additions)). French business creations and
+   failures come from Eurostat, from 2015. French household loan arrears are
+   shown as missing, labelled.
+2. **Computed Indicators are accepted**, labelled "computed by Spock" (for
+   example real compensation per hour for France and the EU).
+3. **SEC contact**: the Owner's personal email, stored as a private setting,
+   never in the repository.
+4. **Banque de France**: no account for now (see
+   [Later additions](#later-additions)).
+5. **Hyperscaler list**: Microsoft, Alphabet, Amazon, Meta and Oracle, plus
+   CoreWeave and Nvidia.
+6. **New Indicator 25, revenue of AI model companies**, starting with
+   Anthropic; OpenAI to follow if it becomes listed. Anthropic is not added
+   to capital spending.
+7. **Adobe and Figma**: a later idea, not an Indicator.
+8. **W1 and W2 merged** into "Are workers getting their share of AI's
+   gains?", with productivity against real pay as the headline Divergence.
+9. **Divergence rule, option A**: wider than in 95% of its own history, for
+   two releases in a row. Patterns: each Indicator against its own history.
+   Option C (Owner-set thresholds) is a later option.
+10. **Industry detail, option A**: keep Indicators without a breakdown if
+    each is in a Watched relationship; show breakdowns wherever they exist.
+11. **Charts over time by default**, with Historical episodes shaded;
+    combinations of Watched relationships later, as named Patterns.
+12. **Two Dashboards**: the Signals dashboard (Watched relationships) first,
+    the Data dashboard (Core families) second, under the principle that
+    Spock arranges data so people can make sense of it (ADR 0004). See
+    [Dashboards](#dashboards).
+
+The first pass's question "allow the hosts first?" was answered by adding the
+hosts to the cloud environment before this second pass.
 
 ## Open questions for the Owner
 
-1. **Allow the hosts first?** This note could not open any publisher's site.
-   Should the hosts above be added to the cloud environment before anyone
-   checks the [U] items and builds the data collection? (Recommended: yes.)
-2. **France: INSEE or Eurostat?** For France, many Indicators exist both at
-   INSEE (longer history, French definitions) and at Eurostat (same
-   definitions as the EU, shorter history). Recommended: Eurostat by default,
-   so France and the EU are comparable, and INSEE only where it adds history
-   before 1995.
-3. **Computed Indicators.** Real compensation per hour (8) for France and the
-   EU must be computed from three Eurostat figures. Is the Owner comfortable
-   showing an Indicator Spock computes, clearly labelled, rather than one a
-   publisher publishes?
-4. **SEC contact email.** The SEC requires each request to carry contact
-   details. Which email should Spock declare: the Owner's, or a dedicated
-   address?
-5. **Banque de France account.** Worth one more account to get French
-   business failures back to 1991, or is Eurostat from 2015 enough?
-6. **Hyperscaler list.** Microsoft, Alphabet, Amazon, Meta and Oracle. Add or
-   remove any (for example Apple, or a European firm)?
+1. **Homes for three Indicators.** Total employment (2), new business
+   creations (16) and data-centre construction (23) are in no Watched
+   relationship yet. Recommended: add 2 to W3, 16 to W7 and 23 to W2 (see
+   [Indicators not yet in a Watched relationship](#indicators-not-yet-in-a-watched-relationship)).
+2. **Household arrears for France and the EU.** Eurostat publishes a yearly
+   survey figure (share of people behind on loan payments), France from
+   2004, EU from 2010. Show it, clearly labelled as yearly, instead of
+   showing the Indicator as missing? Recommended: yes; it keeps W7 complete
+   in all three Regions, at the cost of one late, yearly figure.
+3. **Which price index for real compensation (8) in France and the EU?**
+   Option A: consumer prices (HICP), the common European measure; the
+   Indicator then starts in 1996 (France) and 2000 (EU). Option B: the price
+   of household consumption from the national accounts (current prices
+   divided by volumes in `namq_10_gdp`, both available [V]); it starts in
+   1980 (France) and 1995 (EU), so France covers the Internet wave.
+   Recommended: B, for the longer history; both cost nothing and can be
+   swapped later.
+4. **France Travail hiring plans (BMO) left out.** Confirm that France's
+   AI-exposed occupations come only from Eurostat for now (yearly, from
+   2011), with BMO as a later addition. Recommended: yes.
 
 ## Sources
 
-Every source below was seen only through a web-search result, not opened
-directly (see [How this note was checked](#how-this-note-was-checked)).
+Opened directly on 2026-11-19 unless marked [S] (seen only through search).
 
 US
 
-- BLS, Public Data API FAQ: <https://www.bls.gov/developers/api_faqs.htm>
-- BLS, JOLTS history (Handbook of Methods): <https://www.bls.gov/opub/hom/jlt/history.htm>
-- BLS, OEWS history (Handbook of Methods): <https://www.bls.gov/opub/hom/oews/history.htm>
-- FRED, OPHNFB: <https://fred.stlouisfed.org/series/OPHNFB>
-- FRED, COMPRNFB: <https://fred.stlouisfed.org/series/COMPRNFB>
-- FRED, PRS85006173: <https://fred.stlouisfed.org/series/PRS85006173>
-- FRED, DRTSCILM: <https://fred.stlouisfed.org/series/DRTSCILM>
+- FRED pages for each code (title, units, frequency, dates): `https://fred.stlouisfed.org/series/<code>` for every FRED code above, for example <https://fred.stlouisfed.org/series/OPHNFB>, <https://fred.stlouisfed.org/series/COMPRNFB>, <https://fred.stlouisfed.org/series/PRS85006173>, <https://fred.stlouisfed.org/series/DRTSCILM>, <https://fred.stlouisfed.org/series/Y034RA3Q086SBEA>, <https://fred.stlouisfed.org/series/RVAI>
+- FRED API key page: <https://fred.stlouisfed.org/docs/api/api_key.html>
+- FRED API errors and rate limit: <https://fred.stlouisfed.org/docs/api/fred/errors.html>
+- FRED API terms of use: <https://fred.stlouisfed.org/docs/api/terms_of_use.html>
+- BLS, Public Data API FAQ [S]: <https://www.bls.gov/developers/api_faqs.htm>
+- BLS, JOLTS history (Handbook of Methods) [S]: <https://www.bls.gov/opub/hom/jlt/history.htm>
+- BLS, OEWS history (Handbook of Methods) [S]: <https://www.bls.gov/opub/hom/oews/history.htm>
+- Census Bureau, construction spending: <https://www.census.gov/construction/c30/c30index.html> and file <https://www.census.gov/construction/c30/xlsx/privsatime.xlsx>
+- Census Bureau, API catalogue: <https://api.census.gov/data.json>
 - Census Bureau, AI use in small businesses (BTOS): <https://www.census.gov/newsroom/blogs/research-matters/2024/12/ai-use-small-businesses.html>
-- Census Bureau, AI use by firm size (2026): <https://census.gov/library/stories/2026/05/ai-use-businesses.html>
-- Census Bureau, Data API user guide: <https://www.census.gov/data/developers/guidance/api-user-guide.Help_&_Contact_Us.html>
-- SEC, Accessing EDGAR data: <https://www.sec.gov/os/accessing-edgar-data>
-- SEC, Developer resources: <https://www.sec.gov/developer>
-- SEC, Amazon filing index (CIK 1018724): <https://www.sec.gov/Archives/edgar/data/1018724/000101872425000123/R8.htm>
+- Census Bureau, AI use by firm size (2026): <https://www.census.gov/library/stories/2026/05/ai-use-businesses.html>
+- US Courts, bankruptcy filing statistics: <https://www.uscourts.gov/data-news/reports/statistical-reports/bankruptcy-filings-statistics>
+- US Courts, table F-2, three months to 30 September 2026: <https://www.uscourts.gov/data-news/data-tables/2026/09/30/bankruptcy-filings/f-2-three-months>
+- SEC, company figures: `https://data.sec.gov/api/xbrl/companyfacts/CIK<10-digit CIK>.json` for each company above
+- SEC, company filings lists: `https://data.sec.gov/submissions/CIK<10-digit CIK>.json`
+- SEC, Accessing EDGAR data [S]: <https://www.sec.gov/os/accessing-edgar-data>
+- SEC, Developer resources [S]: <https://www.sec.gov/developer>
+- SEC, Anthropic, PBC final prospectus (form 424B4, read 2026-11-19): <https://www.sec.gov/Archives/edgar/data/2130357/000162828026074944/anthropicpbc-424b4.htm>
 
-France
+European Union and France
 
+- Eurostat, dissemination API: `https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/<dataset>` for every dataset above
+- Eurostat, catalogue of all datasets: <https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en>
+- Eurostat, API introduction: <https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-introduction>
+- Eurostat, news "20% of EU enterprises use AI technologies": <https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251211-2>
+- Eurostat, job vacancy release (March 2024): <https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/3-15032024-ap>
+- Eurostat, job vacancy metadata for France: <https://ec.europa.eu/eurostat/cache/metadata/EN/jvs_esqrs_fr.htm>
+- Eurostat, registrations and bankruptcies (now redirects to Eurostat's main page) [S]: <https://ec.europa.eu/eurostat/statistics-explained/index.php/Quarterly_registrations_of_new_businesses_and_declarations_of_bankruptcies_-_statistics>
+- European Commission, AMECO web query (adjusted wage share): <https://ec.europa.eu/economy_finance/ameco/wq/series?fullVariable=1.0.0.0.ALCD2&countries=FRA,EU27&years=1995,2025&defaultCountries=0&Lastyear=0&Yearorder=ASC>
+- ECB, data API: `https://data-api.ecb.europa.eu/service/data/<dataset>/<key>` for the `BLS` and `CISS` keys above
+- ECB, working paper 1426 (CISS) [S]: <https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp1426.pdf>
 - INSEE, methodological note on labour indicators, 2026 Q2: <https://www.insee.fr/fr/statistiques/documentation/Note_methodologique_2026T2.pdf>
-- INSEE, "L'essentiel sur... le chômage": <https://www.insee.fr/fr/statistiques/4805248>
+
+For the later additions only [S]
+
 - INSEE, monthly consumer confidence survey (Camme): <https://www.insee.fr/en/metadonnees/source/s1046>
 - INSEE, SDMX web service guide: <https://www.insee.fr/fr/statistiques/fichier/2862759/BDM_serviceweb_SDMX_V2_2_guideutilisation.pdf>
-- INSEE, SDMX web service (English): <https://insee.fr/en/information/2868055>
 - Banque de France, business failures bulletin (July 2026): <https://www.banque-france.fr/fr/statistiques/entreprises/defaillances-dentreprises-2026-07>
 - Banque de France, Webstat API page: <https://webstat.banque-france.fr/en/pages/api/>
 - France Travail, BMO 2026: <https://www.francetravail.fr/candidat/decouvrir-le-marche-du-travail/besoins-en-main-doeuvre.html>
 - data.gouv.fr, BMO dataset: <https://www.data.gouv.fr/datasets/enquete-besoins-en-main-doeuvre-bmo>
-
-European Union
-
-- Eurostat, API introduction: <https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-introduction>
-- Eurostat, API getting started: <https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started>
-- Eurostat, une_rt_m metadata: <https://ec.europa.eu/eurostat/cache/metadata/en/une_rt_m_esms.htm>
-- Eurostat, registrations and bankruptcies: <https://ec.europa.eu/eurostat/statistics-explained/index.php/Quarterly_registrations_of_new_businesses_and_declarations_of_bankruptcies_-_statistics>
-- Eurostat, use of AI in enterprises: <https://ec.europa.eu/eurostat/statistics-explained/index.php/Use_of_artificial_intelligence_in_enterprises>
-- Eurostat, news "20% of EU enterprises use AI technologies": <https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251211-2>
-- Eurostat, job vacancy release (March 2024): <https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/3-15032024-ap>
-- Eurostat, job vacancy metadata for France: <https://ec.europa.eu/eurostat/cache/metadata/EN/jvs_esqrs_fr.htm>
-- ECB, Data Portal API help: <https://data.ecb.europa.eu/help/api/data>
-- ECB, working paper 1426 (CISS): <https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp1426.pdf>
-
-Unofficial copies consulted only as leads (marked [U] where used)
-
-- DBnomics copies of Eurostat datasets `lfsa_egai2d`, `une_rt_m`,
-  `ei_bsco_m`, `sts_rb_a`: <https://db.nomics.world/Eurostat>
