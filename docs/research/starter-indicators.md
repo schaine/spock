@@ -31,7 +31,7 @@ Owner's decisions (see
 - **The United States has the richest data.** France and the European Union
   are thinner on AI-exposed occupations (yearly instead of monthly), on bank
   lending and financial stress (only the member states that use the euro),
-  on household loan arrears (no frequent figure) and on AI investment (no
+  on household loan arrears (yearly only) and on AI investment (no
   data-centre or company-spending equivalent).
 - **Better history than first thought.** Eurostat's French figures for jobs,
   productivity, pay, household income and saving start in **1980 to 1983**,
@@ -319,17 +319,19 @@ rises. It tells whether workers share in AI productivity gains.
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
 | United States | BLS, via FRED | `COMPRNFB`, nonfarm business, index 2017 = 100, seasonally adjusted [V] | Quarterly [V] | 1947 Q1 [V] | Yes | FRED API |
-| France | **Computed by Spock** from Eurostat: compensation of employees ÷ hours worked ÷ consumer prices | `namq_10_a10`, `TOTAL`, `D1`, `SA` (France has no `SCA` version) [V]; `namq_10_a10_e`, `TOTAL`, `EMP_DC`, unit `THS_HW` [V]; `prc_hicp_minr`, `TOTAL`, index 2025 = 100 [V] | Quarterly | Pay and hours 1980 Q1 [V]; prices January 1996 [V], so the Indicator starts in 1996 | No (from 1996) | Eurostat API |
-| European Union | **Computed by Spock**, same method | Same codes, geo `EU27_2020`, `SCA` [V] | Quarterly | Pay and hours 1995 Q1 [V]; prices December 1999 [V], so the Indicator starts in 2000 | No | Eurostat API |
+| France | **Computed by Spock** from Eurostat: compensation of employees ÷ hours worked ÷ price of household consumption | `namq_10_a10`, `TOTAL`, `D1`, `SA` (France has no `SCA` version) [V]; `namq_10_a10_e`, `TOTAL`, `EMP_DC`, unit `THS_HW` [V]; price of household consumption = `namq_10_gdp`, `P31_S14`, current prices ÷ chain-linked volumes [V] | Quarterly | 1980 Q1 [V] | Yes | Eurostat API |
+| European Union | **Computed by Spock**, same method | Same codes, geo `EU27_2020`, `SCA` [V] | Quarterly | 1995 Q1 [V] | No | Eurostat API |
 
 **Corrections:** the consumer price dataset named in the first pass,
 `prc_hicp_midx`, was closed with data up to December 2025; its replacement
 is `prc_hicp_minr` [V]. The EU price index starts in December 1999 in the
 replacement, not 1996 [V].
 
-The Owner accepted computed Indicators (decision 2). A choice remains on
-which price index to divide by: see
-[Open questions](#open-questions-for-the-owner).
+The Owner accepted computed Indicators (decision 2) and chose the price of
+household consumption from the national accounts over consumer prices
+(HICP), for the longer history: France then covers the Internet wave
+(decision 15). The consumer price index `prc_hicp_minr` (France from 1996,
+EU from 1999) stays available as an alternative.
 Source for the US code: [FRED COMPRNFB](https://fred.stlouisfed.org/series/COMPRNFB) [V].
 
 Industry breakdown: United States, none for this figure; France and European
@@ -575,15 +577,13 @@ causes job losses, households fall behind on payments.
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
 | United States | Federal Reserve, via FRED | `DRCCLACBS` (credit cards, all commercial banks, seasonally adjusted) [V] | Quarterly [V] | 1991 Q1 [V] | Yes | FRED API |
-| France | **Missing, labelled on the Dashboard** (decision 1): no quarterly or monthly figure without the Banque de France | — | — | — | — | — |
-| European Union | **Missing, labelled on the Dashboard**: no quarterly or monthly figure for all 27 | — | — | — | — | — |
+| France | Eurostat (survey of household living conditions) | `ilc_mdes08`, arrears on hire purchase instalments or other loan payments, % of the population, geo `FR` [V] | **Yearly**, labelled as such | 2004 [V] | No | Eurostat API |
+| European Union | Eurostat, same survey | `ilc_mdes08`, geo `EU27_2020` [V] | **Yearly**, labelled as such | 2010 [V] | No | Eurostat API |
 
-**Correction:** a yearly figure does exist for both France and the European
-Union [V]: Eurostat's survey of household living conditions,
-`ilc_mdes08` ("arrears on hire purchase instalments or other loan
-payments", % of the population), France from 2004, EU from 2010. It is
-yearly and published late, so it shows the level, not early movement. See
-[Open questions](#open-questions-for-the-owner).
+France and the European Union use a yearly survey figure (decision 14). It
+is published late and shows the level, not early movement; the Dashboard
+labels it as yearly. It also measures people rather than loans, so its
+level cannot be compared with the US rate, only its direction.
 
 Industry breakdown: none.
 
@@ -863,12 +863,12 @@ same way at the same time).
 | # | Indicators | Kind | Plain-English question | What it would mean |
 | --- | --- | --- | --- | --- |
 | W1 | Headline: 7 Productivity against 8 Real compensation per hour. Supporting: 9 Labour share, 10 Inequality | Divergence (with supporting Indicators) | Are workers getting their share of AI's gains? | Productivity rising while real pay stays flat; labour share falling and inequality rising at the same time confirm that AI's gains go to capital rather than workers. |
-| W2 | 20 Hyperscaler spending; 21 IT investment; 22 Firms using AI; 25 Revenue of AI model companies; 5 Employment in AI-exposed occupations | Pattern | Is AI investment replacing the jobs it targets? | Investment, adoption and spending on AI models rising while employment in exposed occupations falls. |
-| W3 | 24 Output of information industry; 6 Employment in information and professional services | Divergence | Is the tech industry growing without hiring? | Output rising while employment stalls or falls. |
+| W2 | 20 Hyperscaler spending; 21 IT investment; 22 Firms using AI; 23 Data-centre construction; 25 Revenue of AI model companies; 5 Employment in AI-exposed occupations | Pattern | Is AI investment replacing the jobs it targets? | Investment, adoption and spending on AI models rising while employment in exposed occupations falls. |
+| W3 | 24 Output of information industry; 6 Employment in information and professional services; 2 Total employment (yardstick) | Divergence | Is the tech industry growing without hiring? | Output rising while employment stalls or falls, and the industry's share of total employment shrinking. |
 | W4 | 4 Youth unemployment; 1 Unemployment rate | Divergence | Are young people hit first? | Youth unemployment rising while the overall rate stays stable. |
 | W5 | 3 Job openings; 1 Unemployment rate | Divergence | Are employers hiring less without laying off yet? | Openings falling while unemployment stays low; or both rising, meaning jobs on offer no longer match the people looking. |
 | W6 | 14 Confidence and unemployment fears; 13 Saving rate; 12 Real consumption; 11 Real disposable income | Pattern | Are households getting worried and cutting back? | Fear of unemployment and saving up, spending down, possibly before income falls. |
-| W7 | 17 Lending standards; 18 Financial stress; 15 Business failures; 19 Household arrears | Pattern | Is the financial system turning against firms and households? | Tighter credit and higher stress, followed by more failures and arrears. |
+| W7 | 17 Lending standards; 18 Financial stress; 15 Business failures; 16 New business creations; 19 Household arrears | Pattern | Is the financial system turning against firms and households? | Tighter credit and higher stress, followed by more failures, fewer creations and more arrears. |
 | W8 | 22 Firms using AI; 21 IT investment; 7 Productivity, compared across the three Regions | Divergence | Is AI adoption showing up in productivity, and where first? | One Region adopting and investing faster and pulling ahead in productivity, as the United States did during the Internet wave [U]; or adoption rising everywhere with no productivity gain anywhere. |
 
 W1 merges the first pass's W1 and W2 (decision 8). Revenue of AI model
@@ -879,13 +879,13 @@ States, and W1 (without labour share and inequality), W4, W5 and W6 also in
 France, since Eurostat's French figures start in 1980 to 1985. The EU total
 mostly starts in 1995 to 2000.
 
-### Indicators not yet in a Watched relationship
+### Indicators added to a Watched relationship late
 
 Decision 10 says every Indicator must appear in at least one Watched
-relationship. Three do not yet: **2 Total employment**, **16 New business
-creations** and **23 Data-centre construction spending**. Proposed homes,
-for the Owner to approve (see
-[Open questions](#open-questions-for-the-owner)):
+relationship. Three were missing one: **2 Total employment**, **16 New
+business creations** and **23 Data-centre construction spending**. The
+Owner approved these homes on 2026-11-19 (decision 13), and the table above
+includes them:
 
 - 2 Total employment in **W3**, as the economy-wide yardstick: employment in
   information and professional services (6) as a share of total employment
@@ -1058,8 +1058,8 @@ These will be shown, labelled, on the Dashboard.
 - **Bank lending standards** (17) and **financial stress** (18): France and
   the member states using the euro, not all 27 members of the European
   Union.
-- **Household arrears** (19): no quarterly or monthly figure for France or
-  the European Union; a yearly survey figure exists (open question).
+- **Household arrears** (19): France and the European Union have only a
+  yearly survey figure, from 2004 and 2010, shown labelled as yearly.
 - **AI-exposed occupations** (5): yearly everywhere for easy-to-use data;
   translation cannot be isolated in EU data; history starts in 1997 (US) and
   2011 (France, EU).
@@ -1148,32 +1148,24 @@ questions.
     the Data dashboard (Core families) second, under the principle that
     Spock arranges data so people can make sense of it (ADR 0004). See
     [Dashboards](#dashboards).
+13. **Homes for three Indicators**: Total employment (2) in W3, New business
+    creations (16) in W7, Data-centre construction (23) in W2.
+14. **Household arrears for France and the EU**: shown from Eurostat's yearly
+    survey figure, labelled as yearly, instead of as missing.
+15. **Price index for real compensation (8) in France and the EU**: the
+    price of household consumption from the national accounts, for the
+    longer history.
+16. **France Travail hiring plans (BMO)**: left out for now; France's
+    AI-exposed occupations come from Eurostat only (see
+    [Later additions](#later-additions)).
 
 The first pass's question "allow the hosts first?" was answered by adding the
 hosts to the cloud environment before this second pass.
 
 ## Open questions for the Owner
 
-1. **Homes for three Indicators.** Total employment (2), new business
-   creations (16) and data-centre construction (23) are in no Watched
-   relationship yet. Recommended: add 2 to W3, 16 to W7 and 23 to W2 (see
-   [Indicators not yet in a Watched relationship](#indicators-not-yet-in-a-watched-relationship)).
-2. **Household arrears for France and the EU.** Eurostat publishes a yearly
-   survey figure (share of people behind on loan payments), France from
-   2004, EU from 2010. Show it, clearly labelled as yearly, instead of
-   showing the Indicator as missing? Recommended: yes; it keeps W7 complete
-   in all three Regions, at the cost of one late, yearly figure.
-3. **Which price index for real compensation (8) in France and the EU?**
-   Option A: consumer prices (HICP), the common European measure; the
-   Indicator then starts in 1996 (France) and 2000 (EU). Option B: the price
-   of household consumption from the national accounts (current prices
-   divided by volumes in `namq_10_gdp`, both available [V]); it starts in
-   1980 (France) and 1995 (EU), so France covers the Internet wave.
-   Recommended: B, for the longer history; both cost nothing and can be
-   swapped later.
-4. **France Travail hiring plans (BMO) left out.** Confirm that France's
-   AI-exposed occupations come only from Eurostat for now (yearly, from
-   2011), with BMO as a later addition. Recommended: yes.
+None at the moment: the Owner answered all of them on 2026-11-19 (see
+[Decisions by the Owner](#decisions-by-the-owner-2026-11-19)).
 
 ## Sources
 
