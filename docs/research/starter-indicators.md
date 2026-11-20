@@ -1227,17 +1227,14 @@ questions.
 16. **France Travail hiring plans (BMO)**: left out for now; France's
     AI-exposed occupations come from Eurostat only (see
     [Later additions](#later-additions)).
-
-Approved by the Owner on 2026-11-20:
-
-17. **Which AI model companies count**: listed, mostly selling AI models or
+17. **Which AI model companies count** (2026-11-20): listed, mostly selling AI models or
     AI computing power, and reporting that revenue separately. The list:
     Anthropic and CoreWeave; OpenAI and Mistral AI if they become listed.
     See [Revenue of AI model companies](#revenue-of-ai-model-companies).
-18. **New Indicator 26, profitability of AI model companies** (operating
+18. **New Indicator 26, profitability of AI model companies** (2026-11-20; operating
     margin), and **new Watched relationship W9**, "Is the AI boom paying for
     itself?", in the "Is AI arriving?" section of the Signals dashboard.
-19. **xAI left out**: it is part of SpaceX, which fails the rule; the rule
+19. **xAI left out** (2026-11-20): it is part of SpaceX, which fails the rule; the rule
     is not widened to separately reported segments.
 
 The first pass's question "allow the hosts first?" was answered by adding the
