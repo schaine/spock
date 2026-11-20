@@ -8,11 +8,11 @@ Owner's decisions (see
 
 ## In short
 
-- **25 Indicators** across the five Core families: Jobs and labour markets
+- **26 Indicators** across the five Core families: Jobs and labour markets
   (6), Productivity, wages and income distribution (4), Household income and
   consumption (4), Financial conditions and business failures (5), AI
-  investment and technological adoption (6).
-- **8 Watched relationships**, from "are workers getting their share of AI's
+  investment and technological adoption (7).
+- **9 Watched relationships**, from "are workers getting their share of AI's
   gains?" to "is AI adoption showing up in productivity in all three
   Regions?".
 - Almost everything comes from **free official sources with a documented
@@ -116,7 +116,7 @@ the cloud environment. Each kept Indicator was then checked as follows:
 - **Computed by Spock**: an Indicator that no publisher publishes as such,
   which Spock calculates from published figures, with the method shown.
 
-## The 25 Indicators
+## The 26 Indicators
 
 Each Indicator below gives what it measures, why it reveals the economic
 consequences of AI, its Core family, whether it is Leading or Lagging, a
@@ -711,11 +711,40 @@ firms and people actually pay to use AI, which the adoption surveys
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States (US-listed companies) | Company filings to the SEC (EDGAR) | Anthropic, PBC, CIK `2130357` [V]: no machine-readable revenue yet [V] | Quarterly, from its first quarterly report (10-Q) | 2023, from the prospectus [V] | No | SEC EDGAR API (no key) [V] |
+| United States (US-listed companies) | Company filings to the SEC (EDGAR) | Anthropic, PBC, CIK `2130357`: no machine-readable revenue yet [V]. CoreWeave, CIK `1769628`: `RevenueFromContractWithCustomerExcludingAssessedTax`, from 2023 [V] | Quarterly (Anthropic from its first quarterly report, 10-Q) | 2023 [V] | No | SEC EDGAR API (no key) [V] |
 | France | **Not available**: no listed French AI model company | — | — | — | — | — |
 | European Union | **Not available**: no listed EU equivalent | — | — | — | — | — |
 
-Details in [Revenue of AI model companies](#revenue-of-ai-model-companies).
+Details, including which companies count and why, in
+[Revenue of AI model companies](#revenue-of-ai-model-companies).
+
+Industry breakdown: not applicable; the breakdown is by company.
+
+#### 26. Profitability of AI model companies
+
+Operating margin of the same companies as Indicator 25: operating profit
+(revenue minus the costs of running the business) divided by revenue, as a
+percentage. Revenue says how much the economy pays for AI; this says whether
+selling AI makes money. A company can grow its revenue every year and still
+lose money on each dollar sold.
+
+- Core family: AI investment and technological adoption, next to
+  Indicator 25, because it covers the same companies from the same filings.
+- **Leading**: if spending and revenue keep climbing while margins stay
+  negative or worsen, the AI boom depends on investors' patience. When that
+  runs out, investment can stop abruptly, as it did after the Internet wave.
+  This shows before any effect on jobs or failures.
+
+| Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
+| --- | --- | --- | --- | --- | --- | --- |
+| United States (US-listed companies) | Company filings to the SEC (EDGAR) | **Computed by Spock**: `OperatingIncomeLoss` ÷ revenue. Anthropic: from its first 10-Q; the prospectus gives an operating loss of $1.3 billion for the nine months to 2026-09-30, against $5.2 billion a year earlier [V]. CoreWeave: `OperatingIncomeLoss` from 2023 [V] | Quarterly | 2023 [V] | No | SEC EDGAR API (no key) [V] |
+| France | **Not available**: no listed French AI model company | — | — | — | — | — |
+| European Union | **Not available**: no listed EU equivalent | — | — | — | — | — |
+
+Operating margin rather than net profit: net profit also moves with one-off
+items, such as changes in the value of investments the company holds.
+Quarterly reports give the year so far for some figures; the quarter alone
+must then be computed by subtraction, as for capital spending.
 
 Industry breakdown: not applicable; the breakdown is by company.
 
@@ -827,6 +856,30 @@ tags (called XBRL) that the SEC republishes for free [V].
 
 ### Revenue of AI model companies
 
+**Which companies count** (decision 17). A company is included when all
+three are true:
+
+1. it is listed on a stock exchange, so it must publish audited accounts
+   for free;
+2. most of its revenue comes from selling AI models or AI computing power;
+3. it reports that revenue as a separate figure in its official filings.
+
+This leaves out Microsoft, Alphabet, Amazon and Meta: they earn a lot from
+AI but report it mixed with their cloud and advertising businesses. Their AI
+effort is counted through capital spending (Indicator 20). Every change to
+the list is recorded with its date, so the Indicator's history stays
+understandable.
+
+**The list on 2026-11-20:** Anthropic and CoreWeave. To add when they
+become listed: OpenAI, and Mistral AI (French; if it lists in Paris, its
+figures would come from its filings to the French market regulator, not the
+SEC). xAI: see [Open questions](#open-questions-for-the-owner).
+
+- **CoreWeave**: CIK `1769628`. It rents out computing power built for AI.
+  Its revenue (`RevenueFromContractWithCustomerExcludingAssessedTax`) and
+  operating profit (`OperatingIncomeLoss`) are in the SEC's machine-readable
+  data from 2023 [V]. It is also in capital spending (Indicator 20): there
+  it counts what it spends, here what it earns, so nothing is counted twice.
 - **Anthropic, PBC**: CIK `2130357`, ticker `ANT`, year ending in December
   [V]. Its final prospectus (form 424B4) was filed on 2026-11-19 under
   accession number `0001628280-26-074944` [V]. The prospectus gives an
@@ -844,19 +897,20 @@ tags (called XBRL) that the SEC republishes for free [V].
   - revenue from customers paying $100,000 or more over twelve months grew
     from about $37 million (2023) to $220 million (2024), $3.5 billion (2025)
     and $26.1 billion (twelve months to 2026-09-30);
+  - operating loss of $1.3 billion for the nine months to 2026-09-30,
+    against $5.2 billion a year earlier (Indicator 26);
   - purchases of property and equipment were small: $2 million, $15 million
     and $131 million for 2023 to 2025, and $925 million for the nine months
     to 2026-09-30, plus $1,955 million of prepayments for leased assets.
 - **Not added to capital spending.** Anthropic mostly rents its computing
   power from cloud companies already in Indicator 20; adding its own small
   spending would count the same money twice.
-- **OpenAI**: add it if and when it becomes a listed company.
 - **Limits:** US-listed companies only; no French or EU equivalent exists.
   History starts in 2023.
 
 ## Watched relationships
 
-Eight proposals. Each checks for a Divergence (two Indicators that normally
+Nine proposals. Each checks for a Divergence (two Indicators that normally
 move together drifting apart) or a Pattern (several Indicators pointing the
 same way at the same time).
 
@@ -870,9 +924,11 @@ same way at the same time).
 | W6 | 14 Confidence and unemployment fears; 13 Saving rate; 12 Real consumption; 11 Real disposable income | Pattern | Are households getting worried and cutting back? | Fear of unemployment and saving up, spending down, possibly before income falls. |
 | W7 | 17 Lending standards; 18 Financial stress; 15 Business failures; 16 New business creations; 19 Household arrears | Pattern | Is the financial system turning against firms and households? | Tighter credit and higher stress, followed by more failures, fewer creations and more arrears. |
 | W8 | 22 Firms using AI; 21 IT investment; 7 Productivity, compared across the three Regions | Divergence | Is AI adoption showing up in productivity, and where first? | One Region adopting and investing faster and pulling ahead in productivity, as the United States did during the Internet wave [U]; or adoption rising everywhere with no productivity gain anywhere. |
+| W9 | 20 Hyperscaler spending; 25 Revenue of AI model companies; 26 Profitability of AI model companies | Divergence | Is the AI boom paying for itself? | Spending and revenue climbing while margins stay negative or worsen: the boom rests on investors' patience, which can run out abruptly. Margins turning positive as revenue grows: the spending is starting to pay. |
 
 W1 merges the first pass's W1 and W2 (decision 8). Revenue of AI model
 companies (25) joins W2: it is the most direct measure of AI being paid for.
+W9 was added on 2026-11-20 (decision 18).
 
 W1, W4, W5, W6 and W7 can be compared with the Internet wave in the United
 States, and W1 (without labour share and inequality), W4, W5 and W6 also in
@@ -972,7 +1028,7 @@ at the top:
 
 | Section | Question | Watched relationships |
 | --- | --- | --- |
-| 1. Is AI arriving? | Are firms investing in AI and using it, and does it raise productivity? | W8 |
+| 1. Is AI arriving? | Are firms investing in AI and using it, does it raise productivity, and does it pay for itself? | W8, W9 |
 | 2. Is AI replacing work? | Are jobs disappearing where AI hits first? | W2, W3, W4, W5 |
 | 3. Who gets the gains? | Do the gains go to workers or to capital? | W1 |
 | 4. Are households and firms paying the price? | Is the damage spreading to spending, credit and failures? | W6, W7 |
@@ -1159,13 +1215,46 @@ questions.
     AI-exposed occupations come from Eurostat only (see
     [Later additions](#later-additions)).
 
+Approved by the Owner on 2026-11-20:
+
+17. **Which AI model companies count**: listed, mostly selling AI models or
+    AI computing power, and reporting that revenue separately. The list:
+    Anthropic and CoreWeave; OpenAI and Mistral AI if they become listed.
+    See [Revenue of AI model companies](#revenue-of-ai-model-companies).
+18. **New Indicator 26, profitability of AI model companies** (operating
+    margin), and **new Watched relationship W9**, "Is the AI boom paying for
+    itself?", in the "Is AI arriving?" section of the Signals dashboard.
+
 The first pass's question "allow the hosts first?" was answered by adding the
 hosts to the cloud environment before this second pass.
 
 ## Open questions for the Owner
 
-None at the moment: the Owner answered all of them on 2026-11-19 (see
-[Decisions by the Owner](#decisions-by-the-owner-2026-11-19)).
+1. **xAI.** xAI is no longer a separate company. SpaceX bought it on
+   2026-02-02, and SpaceX is listed on Nasdaq (`SPCX`, CIK `1181412`), with
+   quarterly reports since its June 2026 prospectus [V]. SpaceX reports xAI's
+   business as its "Super Intelligence" (SI) segment, formerly called the AI
+   segment: the Grok models, the Cursor software-engineering tool (bought in
+   mid-August 2026), X subscriptions, AI cloud services, and X advertising
+   [V]. In the quarter to 2026-09-30, the segment had revenue of
+   $7,560 million, of which $538 million was advertising and $7,022 million
+   "SI solutions and infrastructure", and an operating profit of
+   $431 million [V]
+   ([SpaceX 10-Q, 2026-09-30](https://www.sec.gov/Archives/edgar/data/1181412/000162828026066880/spcx-20260930.htm)).
+   It fails rule 2 as written: SI was 40% of SpaceX's revenue over the first
+   nine months of 2026 [V].
+
+   Recommended: widen rule 2 to "most of its revenue, **or a separately
+   reported segment**, comes from AI models or AI computing power", and
+   include SpaceX's "SI solutions and infrastructure" revenue (leaving out X
+   advertising). Leaving xAI out would leave a hole, as it is one of the
+   largest AI model makers. The costs, labelled on the Dashboard:
+   - segment figures are not in the SEC's free summary data; each quarterly
+     report must be read, as for Nvidia's data-centre revenue;
+   - the segment's operating margin (Indicator 26) still includes X
+     advertising, which SpaceX does not separate from costs;
+   - the Cursor purchase makes revenue jump in the third quarter of 2026
+     without any growth in AI use; history starts in 2025.
 
 ## Sources
 
