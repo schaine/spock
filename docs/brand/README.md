@@ -8,14 +8,15 @@ Logo mark: **The Pointed S** — a geometric S formed by two opposing arcs with 
 
 | File | Use |
 |---|---|
-| `symbol-black.svg` | The S mark, black — light backgrounds |
-| `symbol-white.svg` | The S mark, white — dark backgrounds |
+| `symbol-black.svg` | The S mark, black (#0C0D0D) — light backgrounds |
+| `symbol-white.svg` | The S mark, white (#FFFFFF) — dark backgrounds |
+| `symbol-accent.svg` | The S mark, cyan (#17E5E5) — CTAs, active states, flags |
 | `lockup-horizontal-black.svg` | Symbol + SPOCK side by side — desktop headers |
 | `lockup-horizontal-white.svg` | Same, white — dark headers |
 | `lockup-stacked-black.svg` | Symbol above SPOCK — mobile / compact |
 | `lockup-stacked-white.svg` | Same, white — dark mobile |
 
-**Wordmark font:** Helvetica Neue, weight Light (300), letter-spacing 14 (horizontal) or 10 (stacked). Set this in Figma after import — the SVG carries the right font-family and weight attributes.
+**Wordmark font:** Newsreader, weight SemiBold (600), letter-spacing −2% (−1.04px at 52px for horizontal; −0.76px at 38px for stacked). Load Newsreader from Google Fonts. The SVG carries the font-family and weight attributes; in Figma, verify the text layer reads "Newsreader / SemiBold / 600" and set letter-spacing to −2%.
 
 **To convert strokes to paths in Figma:** select the S path → Object → Outline Stroke. Do this before publishing to your design system.
 
@@ -55,14 +56,28 @@ Drop the contents of this folder into your `public/` directory. Copy the `<head>
 
 ## Colour
 
+Design system tokens (Tailwind CSS 4 `@theme`):
+
 | Token | Value | Use |
 |---|---|---|
-| Ink | `#000000` | Mark on light |
-| Chalk | `#FFFFFF` | Mark on dark |
-| Background light | `#FFFFFF` | Default canvas |
-| Background dark | `#0A0A0A` | Dark canvas |
+| `white` | `#FFFFFF` | Page background, mark on dark |
+| `light-grey` | `#F2F7F7` | Alternate surface |
+| `grey` | `#677373` | Secondary text, borders |
+| `black` | `#0C0D0D` | Primary text, strong labels, mark on light |
+| `tertiary` | `#17E5E5` | Cyan accent — CTAs, active states, flags |
 
-No colour palette. The mark is black, white, or grey only by design — this avoids a colour position in a category where data credibility matters more than brand warmth.
+The `symbol-accent.svg` file uses `#17E5E5` and is intended for use on dark (`#0C0D0D`) backgrounds. The black and white variants remain ink-only by design — this avoids a colour position in a category where data credibility matters more than brand warmth.
+
+## Typography
+
+| Typeface | Role | Weights used |
+|---|---|---|
+| Newsreader (Google Fonts) | Display / wordmark | Regular 400, SemiBold 600 |
+| Urbanist (Google Fonts) | UI / body | Light 300, Medium 500 |
+
+**Wordmark** (navigation, lockups): Newsreader SemiBold 600, letter-spacing −2%.
+**Headings**: Newsreader Regular 400 (Heading-1/3) or SemiBold 600 (Heading-2).
+**Body and labels**: Urbanist Light 300 (paragraphs) or Medium 500 (labels).
 
 ## Mark geometry (for reproduction)
 
