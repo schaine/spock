@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPOCK — Symbol · Black
+  Use on white or light backgrounds.
+  In Figma: select the path, then Object → Outline Stroke to convert to filled paths.
+  Geometry: two 68r arcs centred at (128,89) and (128,168), 30° spine.
+  Finials: 16×24 upward-pointing blades at each arm terminal.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img">
+  <title>Spock symbol</title>
+
+  <path d="M 196,89 A 68,68 0 0 0 60,89 L 196,168 A 68,68 0 0 1 60,168"
+        fill="none"
+        stroke="#000000"
+        stroke-width="16"
+        stroke-linecap="butt"
+        stroke-linejoin="round"/>
+
+  <!-- Top finial — right arm blade tip -->
+  <polygon points="188,89 204,89 196,65" fill="#000000"/>
+
+  <!-- Bottom finial — left arm blade tip -->
+  <polygon points="52,168 68,168 60,144" fill="#000000"/>
+
+</svg>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPOCK — Symbol · White
+  Use on black or dark backgrounds.
+  In Figma: select the path, then Object → Outline Stroke to convert to filled paths.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img">
+  <title>Spock symbol</title>
+
+  <path d="M 196,89 A 68,68 0 0 0 60,89 L 196,168 A 68,68 0 0 1 60,168"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="16"
+        stroke-linecap="butt"
+        stroke-linejoin="round"/>
+
+  <!-- Top finial — right arm blade tip -->
+  <polygon points="188,89 204,89 196,65" fill="#FFFFFF"/>
+
+  <!-- Bottom finial — left arm blade tip -->
+  <polygon points="52,168 68,168 60,144" fill="#FFFFFF"/>
+
+</svg>
