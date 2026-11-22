@@ -19,8 +19,16 @@ _Avoid_: Eurozone, euro area, Europe
 ### Indicators
 
 **Indicator**:
-One economic measure, published regularly for a Region, such as the unemployment rate in France.
-_Avoid_: Metric, series, KPI, data point
+One economic measure that Spock follows and compares across Regions, such as the unemployment rate. Each Indicator is made of one or more Series for each Region it covers.
+_Avoid_: Metric, KPI, data point
+
+**Series**:
+One stream of dated values from one Publisher for one Region, such as FRED's `UNRATE`, the US Series of the unemployment rate.
+_Avoid_: Feed, dataset, data point
+
+**Publisher**:
+The official body a Series comes from, such as FRED, Eurostat, the ECB or the SEC.
+_Avoid_: Source, provider, agency
 
 **Indicator family**:
 A group of Indicators that answer the same question about the economy. Spock has five core families and two secondary families.
