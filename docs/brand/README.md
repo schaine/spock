@@ -7,7 +7,7 @@ Logo mark: **The Pointed S** — a geometric S formed by two opposing arcs with 
 ### `svg/` — Masters (import these into Figma)
 
 | File | Use |
-|---|---|
+| --- | --- |
 | `symbol-black.svg` | The S mark, black (#0C0D0D) — light backgrounds |
 | `symbol-white.svg` | The S mark, white (#FFFFFF) — dark backgrounds |
 | `symbol-accent.svg` | The S mark, cyan (#17E5E5) — CTAs, active states, flags |
@@ -25,7 +25,7 @@ Logo mark: **The Pointed S** — a geometric S formed by two opposing arcs with 
 Drop the contents of this folder into your `public/` directory. Copy the `<head>` snippet from `head-snippet.html` into your HTML `<head>`.
 
 | File | Use |
-|---|---|
+| --- | --- |
 | `favicon.ico` | Browser tab icon (16/32/48 px bundled) |
 | `favicon.svg` | SVG favicon (modern browsers) |
 | `favicon-16.png` | 16 × 16 |
@@ -43,7 +43,7 @@ Drop the contents of this folder into your `public/` directory. Copy the `<head>
 ### `png/` — Raster exports (transparent background)
 
 | File | Dimensions |
-|---|---|
+| --- | --- |
 | `symbol-black-512.png` | 512 × 512 |
 | `symbol-black-256.png` | 256 × 256 |
 | `symbol-black-128.png` | 128 × 128 |
@@ -59,7 +59,7 @@ Drop the contents of this folder into your `public/` directory. Copy the `<head>
 Design system tokens (Tailwind CSS 4 `@theme`):
 
 | Token | Value | Use |
-|---|---|---|
+| --- | --- | --- |
 | `white` | `#FFFFFF` | Page background, mark on dark |
 | `light-grey` | `#F2F7F7` | Alternate surface |
 | `grey` | `#677373` | Secondary text, borders |
@@ -71,7 +71,7 @@ The `symbol-accent.svg` file uses `#17E5E5` and is intended for use on dark (`#0
 ## Typography
 
 | Typeface | Role | Weights used |
-|---|---|---|
+| --- | --- | --- |
 | Newsreader (Google Fonts) | Display / wordmark | Regular 400, SemiBold 600 |
 | Urbanist (Google Fonts) | UI / body | Light 300, Medium 500 |
 
@@ -81,7 +81,7 @@ The `symbol-accent.svg` file uses `#17E5E5` and is intended for use on dark (`#0
 
 ## Mark geometry (for reproduction)
 
-```
+```text
 Two circular arcs, each radius 68 units, centred at (128, 89) and (128, 168)
 in a 256 × 256 coordinate space.
 
