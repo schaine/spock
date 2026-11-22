@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPOCK — Stacked lockup · White  (mobile / compact use on dark backgrounds)
+  Wordmark: Newsreader SemiBold (weight 600), letter-spacing −2% = −0.76px at 38px.
+  In Figma: set the text layer font to Newsreader, weight SemiBold (600), letter-spacing −2%.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 260" role="img">
+  <title>Spock</title>
+
+  <g transform="translate(83,12) scale(0.60)">
+    <path d="M 196,89 A 68,68 0 0 0 60,89 L 196,168 A 68,68 0 0 1 60,168"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="16"
+          stroke-linecap="butt"
+          stroke-linejoin="round"/>
+    <polygon points="188,89 204,89 196,65" fill="#FFFFFF"/>
+    <polygon points="52,168 68,168 60,144" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Wordmark — Newsreader SemiBold (600), −2% letter-spacing = −0.76px at 38px -->
+  <text x="160" y="210"
+        font-family="'Newsreader', Georgia, 'Times New Roman', serif"
+        font-size="38"
+        font-weight="600"
+        letter-spacing="-0.76"
+        text-anchor="middle"
+        fill="#FFFFFF">SPOCK</text>
+
+</svg>
