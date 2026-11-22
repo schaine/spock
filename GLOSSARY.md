@@ -30,6 +30,18 @@ _Avoid_: Feed, dataset, data point
 The official body a Series comes from, such as FRED, Eurostat, the ECB or the SEC.
 _Avoid_: Source, provider, agency
 
+**Revision**:
+A Publisher's correction of a value it published earlier. Spock shows the corrected value and records the change in the Update log.
+_Avoid_: Correction, update, restatement
+
+**Break**:
+A date at which a Series changes method, so its values before and after are not strictly comparable, such as a survey question being reworded.
+_Avoid_: Discontinuity, series change
+
+**Update log**:
+Spock's public, dated record of what happened to each Series: new values, Revisions, missed checks and changes to the Series itself, including Breaks. Kept forever.
+_Avoid_: Changelog, activity feed, history
+
 **Indicator family**:
 A group of Indicators that answer the same question about the economy. Spock has five core families and two secondary families.
 _Avoid_: Category, theme, pillar
