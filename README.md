@@ -30,6 +30,19 @@ in `docs/adr/`. Nothing reaches `main` until I merge a pull request
 - Sessions can stay open and be resumed later. Several can run at the same
   time, one per ticket.
 
+## Running the tests
+
+For Claude. The tests need Docker, the Supabase CLI and Deno (versions in
+`.github/workflows/checks.yml`):
+
+```bash
+supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+```
+
+```bash
+scripts/test.sh
+```
+
 ## Skills guide
 
 ### Which command to run

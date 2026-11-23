@@ -39,3 +39,25 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
       - run: sha256sum -c .claude/skills/CHECKSUMS
+
+  test:
+    # Runs the tests: whole nightly runs against saved Publisher answers and
+    # a local test database (Supabase's own, started in Docker).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.6
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 3.3.0
+      - name: Check types and style
+        run: |
+          deno check supabase/functions/
+          deno lint supabase/functions/
+          deno fmt --check supabase/functions/
+      - name: Start the test database
+        run: supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Run the tests
+        run: scripts/test.sh
