@@ -54,7 +54,9 @@ create table public.series_checks (
   series_id bigint primary key references public.series (id),
   last_checked_at timestamptz,
   last_success_at timestamptz,
-  consecutive_failures integer not null default 0,
+  -- Nights in a row whose checks all failed (a failed 05:30 retry does not
+  -- add a second one for the same night).
+  consecutive_failed_nights integer not null default 0,
   -- Technical detail for the Owner and the agent; never shown to Visitors.
   last_error text
 );
@@ -96,38 +98,122 @@ from anon, authenticated;
 
 -- Visitors see check status, but not the technical error text.
 revoke select on public.series_checks from anon, authenticated;
-grant select (series_id, last_checked_at, last_success_at, consecutive_failures)
+grant select (series_id, last_checked_at, last_success_at, consecutive_failed_nights)
   on public.series_checks to anon, authenticated;
 
--- Stores a Series' values from one successful check, in one transaction:
--- clears the previous "new" marks, adds the periods not stored yet, marks
--- them new, and returns them as one JSON list, oldest first (one value, so
--- the API's 1,000-row limit does not cut it). Values already stored are
--- left as they are (Revisions come with ticket #17).
-create function public.store_new_values(p_series_id bigint, p_values jsonb)
-returns jsonb
+-- How periods and values read in Update log sentences.
+create function public.format_period(p_period date, p_frequency text)
+returns text
 language sql
+immutable
 set search_path = ''
 as $$
-  -- Postgres always runs a data-changing WITH part, even when unread.
-  with cleared as (
-    update public.series_values v
-    set is_new = false
-    where v.series_id = p_series_id and v.is_new
-  ),
-  added as (
+  select case p_frequency
+    when 'monthly' then to_char(p_period, 'FMMonth YYYY')
+    else to_char(p_period, 'YYYY-MM-DD') -- other frequencies come with their Series
+  end;
+$$;
+
+create function public.format_value(p_value numeric, p_unit text)
+returns text
+language sql
+immutable
+set search_path = ''
+as $$
+  select case p_unit when 'percent' then p_value::text || '%' else p_value::text || ' ' || p_unit end;
+$$;
+
+-- Records a successful check of a Series, in one transaction so that values
+-- and their Update log lines are never separated: clears the previous "new"
+-- marks, adds the periods not stored yet and marks them new, writes the
+-- Update log (one "History loaded" line for the first load, then one line
+-- per new value), and updates the check status. Values already stored are
+-- left as they are (Revisions come with ticket #17).
+create function public.record_successful_check(p_series_id bigint, p_values jsonb, p_checked_at timestamptz)
+returns void
+language plpgsql
+set search_path = ''
+as $$
+declare
+  v_first_load boolean;
+  v_series record;
+begin
+  v_first_load := not exists (select 1 from public.series_values where series_id = p_series_id);
+
+  select s.frequency, s.unit, i.name as indicator, r.name as region, p.name as publisher
+  into strict v_series
+  from public.series s
+  join public.indicators i on i.number = s.indicator_number
+  left join public.regions r on r.code = s.region_code
+  join public.publishers p on p.code = s.publisher_code
+  where s.id = p_series_id;
+
+  update public.series_values set is_new = false where series_id = p_series_id and is_new;
+
+  with added as (
     insert into public.series_values as v (series_id, period, value, is_new)
     select p_series_id, (o ->> 'period')::date, (o ->> 'value')::numeric, true
     from jsonb_array_elements(p_values) o
     on conflict (series_id, period) do nothing
     returning v.period, v.value
+  ),
+  history_line as (
+    select format('History loaded: %s to %s',
+        public.format_period(min(period), v_series.frequency),
+        public.format_period(max(period), v_series.frequency)) as sentence,
+      jsonb_build_object('first', min(period), 'last', max(period), 'count', count(*)) as details,
+      min(period) as period
+    from added
+    where v_first_load
+    having count(*) > 0
+  ),
+  new_value_lines as (
+    select format('New value from %s: %s, %s: %s',
+        v_series.publisher,
+        concat_ws(', ', v_series.indicator, v_series.region),
+        public.format_period(period, v_series.frequency),
+        public.format_value(value, v_series.unit)) as sentence,
+      jsonb_build_object('period', period, 'value', value) as details,
+      period
+    from added
+    where not v_first_load
   )
-  select coalesce(
-    jsonb_agg(jsonb_build_object('period', period, 'value', value) order by period),
-    '[]'::jsonb
-  )
-  from added;
+  insert into public.update_log (logged_at, kind, series_id, sentence, details)
+  select p_checked_at, 'new_value', p_series_id, sentence, details
+  from (select * from history_line union all select * from new_value_lines) lines
+  order by period;
+
+  insert into public.series_checks as c
+    (series_id, last_checked_at, last_success_at, consecutive_failed_nights, last_error)
+  values (p_series_id, p_checked_at, p_checked_at, 0, null)
+  on conflict (series_id) do update set
+    last_checked_at = excluded.last_checked_at,
+    last_success_at = excluded.last_success_at,
+    consecutive_failed_nights = 0,
+    last_error = null;
+end;
 $$;
 
-revoke execute on function public.store_new_values(bigint, jsonb) from public, anon, authenticated;
-grant execute on function public.store_new_values(bigint, jsonb) to service_role;
+-- Records a failed check. A night counts once: a failure within 12 hours of
+-- an earlier failure (the 05:30 retry after the 23:30 run) adds no night.
+create function public.record_failed_check(p_series_id bigint, p_error text, p_checked_at timestamptz)
+returns void
+language sql
+set search_path = ''
+as $$
+  insert into public.series_checks as c (series_id, last_checked_at, consecutive_failed_nights, last_error)
+  values (p_series_id, p_checked_at, 1, p_error)
+  on conflict (series_id) do update set
+    consecutive_failed_nights = c.consecutive_failed_nights + case
+      when c.last_checked_at > p_checked_at - interval '12 hours'
+        and c.last_checked_at is distinct from c.last_success_at then 0
+      else 1
+    end,
+    last_checked_at = p_checked_at,
+    last_error = p_error;
+$$;
+
+revoke execute on function public.record_successful_check(bigint, jsonb, timestamptz) from public, anon, authenticated;
+revoke execute on function public.record_failed_check(bigint, text, timestamptz) from public, anon, authenticated;
+grant execute on function public.record_successful_check(bigint, jsonb, timestamptz) to service_role;
+grant execute on function public.record_failed_check(bigint, text, timestamptz) to service_role;

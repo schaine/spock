@@ -23,6 +23,19 @@ Versions are the latest stable releases on npm on 2026-11-18.
 | Hosting | Cloudflare Workers, deployed with Wrangler | 4.165.0 |
 | Owner's private connector | MCP server on Cloudflare Workers, `@modelcontextprotocol/sdk`, `agents`, `@cloudflare/workers-oauth-provider` | 1.32.2, 0.33.0, 1.2.4 |
 
+### Versions added with the first code (2026-11-23, ticket #16)
+
+Latest stable releases on npm and JSR that day. Small choices under
+`docs/agents/decisions.md` section 4, listed here so the versions stay in
+one place.
+
+| Part | Choice | Version |
+| --- | --- | --- |
+| Edge Functions runtime and test tool | Deno, with its built-in test runner and `@std/assert` | 2.9.6, `@std/assert` 1.0.19 |
+| Supabase client and CLI | `supabase-js`, Supabase CLI (replace 2.119.1 and 3.2.0 above) | 2.119.2, 3.3.0 |
+| Edge Function key check | `@supabase/server` | 1.9.2 |
+| Test database cleanup | `postgres` (npm) | 4.1.1 |
+
 ## Where data is stored
 
 - Supabase project in the **West EU (Paris)** region, `eu-west-3`, in the Owner's `sch-design` organization. It holds Indicators, Flags and Insights. The only personal data is the Owner's own login: Visitors have no accounts.

@@ -19,6 +19,9 @@ export const visitor = createClient(url, env("SUPABASE_PUBLISHABLE_KEY"));
 
 const collection = createClient(url, env("SUPABASE_SECRET_KEY"));
 
+/** What the Owner can read with the secret key, such as the technical error text. */
+export const owner = collection;
+
 export const TEST_FRED_KEY = "testkeytestkeytestkeytestkey1234";
 
 /** Empties what the collection writes, so each test starts from a fresh database. */
@@ -31,8 +34,8 @@ export async function resetCollectedData(): Promise<void> {
   }
 }
 
-/** A saved answer, or a Publisher failure. */
-export type SavedAnswer = string | { status: number };
+/** A saved answer, a Publisher error status, or a Publisher that cannot be reached at all. */
+export type SavedAnswer = string | { status: number } | "unreachable";
 
 /**
  * Runs the nightly collection exactly as in production, at the given moment,
@@ -53,6 +56,8 @@ export async function runNightAt(
     }
     const answer = saved.fred[requestUrl.searchParams.get("series_id") ?? ""];
     if (answer === undefined) throw new Error(`No saved FRED answer for ${requestUrl}`);
+    // Like Deno's own network errors, the message names the address asked for.
+    if (answer === "unreachable") throw new TypeError(`error sending request for url (${requestUrl})`);
     if (typeof answer !== "string") return new Response("{}", { status: answer.status });
     const body = await Deno.readTextFile(new URL(`./saved_answers/fred/${answer}`, import.meta.url));
     return new Response(body, { status: 200, headers: { "content-type": "application/json" } });

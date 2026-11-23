@@ -18,7 +18,13 @@ export const fredCollector: Collector = {
     url.searchParams.set("api_key", key);
     url.searchParams.set("file_type", "json");
 
-    const response = await fetch(url);
+    let response: Response;
+    try {
+      response = await fetch(url);
+    } catch {
+      // Network errors name the URL, which holds the key: keep them out.
+      throw new Error(`FRED could not be reached for ${series.publisherSeriesCode}.`);
+    }
     if (!response.ok) {
       await response.body?.cancel();
       // The URL holds the key: keep it out of the message.

@@ -1,12 +1,12 @@
 // The nightly collection, tested as a whole: a run fed with saved Publisher
 // answers, checked on what a Visitor can see (spec #15, Testing Decisions).
 import { assert, assertEquals } from "jsr:@std/assert@1.0.19";
-import { resetCollectedData, runNightAt, visitor } from "./harness.ts";
+import { owner, resetCollectedData, runNightAt, TEST_FRED_KEY, visitor } from "./harness.ts";
 
 // 23:30 in Paris on 23 November 2026 (winter time, UTC+1).
 const WINTER_NIGHT = "2026-11-23T22:30:00Z";
 
-async function unrate() {
+async function unrateSeriesId() {
   const { data, error } = await visitor
     .from("series")
     .select("id")
@@ -43,7 +43,7 @@ Deno.test("the first run stores UNRATE's full history and writes one History loa
 
   await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
 
-  const id = await unrate();
+  const id = await unrateSeriesId();
   // 946 months from January 1948 to October 2026, minus October 2025 (no value).
   assertEquals(await storedValues(id), {
     count: 945,
@@ -62,7 +62,7 @@ Deno.test("a later run stores the new month, marks it as new and writes one new 
 
   await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
 
-  const id = await unrate();
+  const id = await unrateSeriesId();
   const { data: newValues } = await visitor.from("series_values").select("period, value")
     .eq("series_id", id).eq("is_new", true);
   assertEquals(newValues, [{ period: "2026-10-01", value: 4.1 }]);
@@ -76,24 +76,24 @@ Deno.test("a later run stores the new month, marks it as new and writes one new 
 
 async function checkStatus(seriesId: number) {
   const { data, error } = await visitor.from("series_checks")
-    .select("last_checked_at, last_success_at, consecutive_failures")
+    .select("last_checked_at, last_success_at, consecutive_failed_nights")
     .eq("series_id", seriesId).single();
   if (error) throw error;
   return {
     lastChecked: new Date(data.last_checked_at).toISOString(),
     lastSuccess: new Date(data.last_success_at).toISOString(),
-    failures: data.consecutive_failures,
+    failedNights: data.consecutive_failed_nights,
   };
 }
 
 Deno.test("each Series records when it was last checked and when it last succeeded", async () => {
   await resetCollectedData();
   await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
-  const id = await unrate();
+  const id = await unrateSeriesId();
   assertEquals(await checkStatus(id), {
     lastChecked: "2026-11-23T22:30:00.000Z",
     lastSuccess: "2026-11-23T22:30:00.000Z",
-    failures: 0,
+    failedNights: 0,
   });
 
   // The next night, FRED is down.
@@ -102,7 +102,7 @@ Deno.test("each Series records when it was last checked and when it last succeed
   assertEquals(await checkStatus(id), {
     lastChecked: "2026-11-24T22:30:00.000Z",
     lastSuccess: "2026-11-23T22:30:00.000Z",
-    failures: 1,
+    failedNights: 1,
   });
   assertEquals((await storedValues(id)).count, 945);
 });
@@ -110,7 +110,7 @@ Deno.test("each Series records when it was last checked and when it last succeed
 Deno.test("a Visitor can read what the collection stored but can write nothing", async () => {
   await resetCollectedData();
   await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
-  const id = await unrate();
+  const id = await unrateSeriesId();
   const before = await storedValues(id);
 
   const attempts = [
@@ -118,10 +118,19 @@ Deno.test("a Visitor can read what the collection stored but can write nothing",
     await visitor.from("series_values").update({ value: 9.9 }).eq("series_id", id),
     await visitor.from("series_values").delete().eq("series_id", id),
     await visitor.from("update_log").insert({ kind: "new_value", series_id: id, sentence: "Fake" }),
-    await visitor.from("series_checks").update({ consecutive_failures: 0 }).eq("series_id", id),
+    await visitor.from("series_checks").update({ consecutive_failed_nights: 0 }).eq("series_id", id),
     await visitor.from("series").update({ status: "coming_soon" }).eq("id", id),
     await visitor.from("indicators").insert({ number: 99, name: "Fake", core_family: "x", timing: "leading" }),
-    await visitor.rpc("store_new_values", { p_series_id: id, p_values: [{ period: "2026-11-01", value: 9.9 }] }),
+    await visitor.rpc("record_successful_check", {
+      p_series_id: id,
+      p_values: [{ period: "2026-11-01", value: 9.9 }],
+      p_checked_at: "2026-11-24T22:30:00Z",
+    }),
+    await visitor.rpc("record_failed_check", {
+      p_series_id: id,
+      p_error: "Fake",
+      p_checked_at: "2026-11-24T22:30:00Z",
+    }),
   ];
 
   for (const attempt of attempts) assert(attempt.error, `A Visitor's write was accepted: ${JSON.stringify(attempt)}`);
@@ -165,12 +174,12 @@ Deno.test("the 05:30 retry collects a Series whose 23:30 check failed", async ()
 
   await runNightAt("2026-11-24T04:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
 
-  const id = await unrate();
+  const id = await unrateSeriesId();
   assertEquals((await storedValues(id)).count, 945);
   assertEquals(await checkStatus(id), {
     lastChecked: "2026-11-24T04:30:00.000Z",
     lastSuccess: "2026-11-24T04:30:00.000Z",
-    failures: 0,
+    failedNights: 0,
   });
 });
 
@@ -182,4 +191,28 @@ Deno.test("the 05:30 retry also runs in summer time", async () => {
   const wrongHour = await runNightAt("2026-07-16T04:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
 
   assertEquals([retry.requests.length, wrongHour.requests.length], [1, 0]);
+});
+
+Deno.test("a night counts as one failed night even when the 05:30 retry fails too", async () => {
+  await resetCollectedData();
+  const down = { fred: { UNRATE: { status: 503 } } };
+  await runNightAt(WINTER_NIGHT, down);
+  await runNightAt("2026-11-24T04:30:00Z", down);
+  const id = await unrateSeriesId();
+  assertEquals((await checkStatus(id)).failedNights, 1);
+
+  await runNightAt("2026-11-24T22:30:00Z", down);
+
+  assertEquals((await checkStatus(id)).failedNights, 2);
+});
+
+Deno.test("when FRED cannot be reached, the error kept for the Owner never holds the FRED key", async () => {
+  await resetCollectedData();
+
+  await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "unreachable" } });
+
+  const { data, error } = await owner.from("series_checks").select("last_error").single();
+  if (error) throw error;
+  assert(data.last_error, "The failure was not recorded");
+  assert(!data.last_error.includes(TEST_FRED_KEY), `The key was stored: ${data.last_error}`);
 });
