@@ -355,8 +355,7 @@ share falls.
 
 **Corrections:** the EU total starts in 1995, not 1960 [V]. AMECO's latest
 years are the Commission's **forecasts** (in November 2026 it showed values
-for 2026 and 2027) [V]; Spock must keep only past years, or label forecasts
-clearly.
+for 2026 and 2027) [V]; Spock keeps only past years (decision 20).
 
 A quarterly French and EU version can be computed from Eurostat national
 accounts (compensation of employees divided by value added), but it ignores
@@ -461,15 +460,24 @@ before it shows in spending.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | University of Michigan, via FRED | `UMCSENT` [V] | Monthly [V] | Monthly from January 1978; older, less frequent values in `UMCSENT1` [V] | Yes | FRED API; third-party data, see [Keys](#keys-registration-and-usage-limits) [V] |
+| United States | **New York Fed** (Survey of Consumer Expectations): mean probability that US unemployment will be higher in a year (decision 22) | To be checked at the publisher before the build [U] | Monthly [S] | 2013 [U] | No | Downloadable file [U] |
 | France | European Commission survey, via Eurostat | `ei_bsco_m`, geo `FR`, `BS-CSMCI` (confidence) and `BS-UE-NY` (unemployment expectations), `SA` [V] | Monthly [V] | January 1985 [V] | Yes | Eurostat API |
 | European Union | European Commission survey, via Eurostat | `ei_bsco_m`, geo `EU27_2020`, same codes [V] | Monthly [V] | January 1985 [V] | Yes | Eurostat API |
 
 **Corrections:** the EU unemployment-expectations code is `BS-UE-NY` [V];
 the EU total starts in January 1985 [V]. INSEE's own French survey is no
 longer used (decision 1); it is weighted differently from the European
-Commission's French figure and can move differently [S]. FRED notes that the
-University of Michigan asks for its data to be shown one month late [V].
+Commission's French figure and can move differently [S].
+
+**Replaced (decision 22):** the University of Michigan index (`UMCSENT`) is
+the only copyrighted Series of the starter list on FRED [V]. FRED's terms
+require the data owner's permission for anything beyond personal use [V],
+and the University's own pages say republishing needs its written consent
+[S]. The New York Fed's survey allows free reuse according to its terms [S];
+it also asks almost the same question as the European Commission's
+unemployment expectations (`BS-UE-NY`). The US has no confidence figure in
+the starter list, labelled as such. The OECD's US confidence index on FRED
+(`CSCICP03USM665S`) stopped in January 2024 [V].
 
 Industry breakdown: not applicable.
 
@@ -554,7 +562,7 @@ trading. An AI investment boom that turns to bust would show here first.
 
 | Region | Publisher | Publisher code | Frequency | Since | Before 1995? | Free API |
 | --- | --- | --- | --- | --- | --- | --- |
-| United States | ECB ("new CISS" for the US) [V]; or St. Louis Fed, via FRED | ECB `CISS`, key `D.US.Z0Z.4F.EC.SS_CIN.IDX` [V]; FRED `STLFSI4` [V] | Daily (ECB) [V]; weekly (FRED) [V] | 2 January 1980 (ECB) [V]; 31 December 1993 (FRED) [V] | Yes | ECB API; FRED API |
+| United States | ECB ("new CISS" for the US) [V] (decision 21; the St. Louis Fed's `STLFSI4` is not used) | ECB `CISS`, key `D.US.Z0Z.4F.EC.SS_CIN.IDX` [V] | Daily [V] | 2 January 1980 [V] | Yes | ECB API |
 | France | ECB | `CISS`, key `D.FR.Z0Z.4F.EC.SS_CIN.IDX` [V] | Daily [V] | 2 January 1980 [V] | Yes | ECB API |
 | European Union | **Not available for all 27**: covers the member states using the euro [V] | `CISS`, key `D.U2.Z0Z.4F.EC.SS_CIN.IDX` [V] | Daily [V] | 3 January 1980 [V] | Yes | ECB API |
 
@@ -1097,6 +1105,7 @@ Two lists: hosts the **daily data collection** must reach, and hosts a
 | `ec.europa.eu` | Eurostat API (`/eurostat/api/dissemination/...`) and AMECO (`/economy_finance/ameco/...`) [V] |
 | `data-api.ecb.europa.eu` | ECB API: lending survey, CISS [V] |
 | `www.uscourts.gov` | US business bankruptcy tables [V] |
+| `www.newyorkfed.org` | New York Fed unemployment expectations (decision 22) [U] |
 
 **Dropped since the first pass**, because nothing in the starter list uses
 them any more: `bdm.insee.fr` and `api.insee.fr` (INSEE, decision 1),
@@ -1236,6 +1245,20 @@ questions.
     itself?", in the "Is AI arriving?" section of the Signals dashboard.
 19. **xAI left out** (2026-11-20): it is part of SpaceX, which fails the rule; the rule
     is not widened to separately reported segments.
+20. **AMECO forecasts** (2026-11-22, during the grill on the daily data
+    collection; its other decisions are in `GLOSSARY.md` and ADR 0005): Spock keeps past years only for labour share (9).
+21. **Two possible sources**: financial stress (18) uses the ECB's index in
+    all three Regions; elsewhere, where this note offers two frequencies
+    (12, 15, 16, 21), both are collected.
+22. **US consumer confidence (14)**: the University of Michigan index is
+    replaced by the New York Fed's unemployment expectations. Its terms and
+    data file must be read at `www.newyorkfed.org` before it is built.
+23. **Anthropic's prospectus figures** (25, 26) are entered once by hand, by
+    the agent, labelled "from the prospectus" with a link, until its first
+    machine-readable report takes over.
+24. **Adding up hyperscalers (20)**: each company's quarter counts in the
+    calendar quarter in which it ends; a quarter's total appears only once
+    all seven have reported.
 
 The first pass's question "allow the hosts first?" was answered by adding the
 hosts to the cloud environment before this second pass.
