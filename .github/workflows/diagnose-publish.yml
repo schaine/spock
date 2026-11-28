@@ -30,7 +30,7 @@ jobs:
           case "$SUPABASE_DB_PASSWORD" in *[[:space:]]*) echo "contains whitespace";; *) echo "no whitespace";; esac
       - name: Does the CLI itself log in? (dry run, changes nothing)
         if: always()
-        run: supabase db push --remote --dry-run --debug 2>&1 | grep -v -i -E 'password|token' | tail -25
+        run: supabase db push --remote --dry-run 2>&1 | tail -25
       - name: Does psql log in with the user postgres.<ref>?
         if: always()
         run: |
