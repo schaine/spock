@@ -31,7 +31,7 @@ jobs:
       - name: Does the CLI itself log in? (dry run, changes nothing)
         if: always()
         run: supabase db push --remote --dry-run 2>&1 | tail -25
-      - name: Does psql log in with the user postgres.<ref>?
+      - name: Does psql log in, as the publish checks do?
         if: always()
         run: |
           url=$(cat supabase/.temp/pooler-url)
