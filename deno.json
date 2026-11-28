@@ -1,0 +1,19 @@
+{
+  "tasks": {
+    "test": "scripts/test.sh",
+    "check": "deno check supabase/functions/"
+  },
+  "fmt": {
+    "lineWidth": 120,
+    "exclude": [
+      "supabase/functions/tests/saved_answers/"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended"
+      ]
+    }
+  }
+}

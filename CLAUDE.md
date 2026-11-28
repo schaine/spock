@@ -17,8 +17,7 @@ Spock is a macroeconomic intelligence platform that monitors key economic indica
 - Never merge a pull request. The owner merges.
 - All changes go through a branch and a pull request, squash-merged; the
   branch is deleted after the merge.
-- When the first application code is added, follow
-  `docs/agents/when-code-arrives.md` in the same pull request.
+- Before writing or reviewing code, read `docs/agents/coding-standards.md`.
 
 ## Agent skills
 
