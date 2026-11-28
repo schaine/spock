@@ -288,3 +288,30 @@ Deno.test("a run where the Publisher changed nothing writes nothing to the Updat
 
   assertEquals((await updateLog()).map((e) => e.sentence), ["History loaded: January 1948 to October 2026"]);
 });
+
+// FRED writes UNRATE with one decimal; a round value keeps its ".0".
+Deno.test("a new value that is a round number keeps its decimal in the Update log", async () => {
+  await resetCollectedData();
+  await runNightAt("2025-02-06T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2024-12.json" } });
+
+  // FRED publishes January 2025: 4.0%.
+  await runNightAt("2025-02-07T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2025-01.json" } });
+
+  assertEquals((await updateLog()).map((e) => e.sentence), [
+    "History loaded: January 1948 to December 2024",
+    "New value from FRED: Unemployment rate, United States, January 2025: 4.0%",
+  ]);
+});
+
+Deno.test("a Revision to a round number keeps its decimal in the Update log", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+
+  // FRED revises August 2026 from 4.1% to 4.0%.
+  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_august_revised.json" } });
+
+  assertEquals((await updateLog()).map((e) => e.sentence), [
+    "History loaded: January 1948 to October 2026",
+    "Revision from FRED: Unemployment rate, United States, August 2026: 4.1% → 4.0%",
+  ]);
+});
