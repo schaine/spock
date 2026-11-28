@@ -38,7 +38,7 @@ one place.
 
 ## Where data is stored
 
-- Supabase project in the **West EU (Paris)** region, `eu-west-3`, in the Owner's `sch-design` organization. It holds Indicators, Flags and Insights. The only personal data is the Owner's own login: Visitors have no accounts.
+- Supabase project in the **West EU (Ireland)** region, `eu-west-1`, in the Owner's `sch-design` organization. It holds Indicators, Flags and Insights. The only personal data is the Owner's own login: Visitors have no accounts. Corrected on 2026-11-28: this line first said Paris (`eu-west-3`), but the project's settings show Ireland. Both are in the European Union, so the data-location rule holds.
 - Cloudflare serves the pages worldwide. The connector's login tokens, for the Owner only, are stored in Cloudflare Workers KV.
 
 ## Choices within the profile
