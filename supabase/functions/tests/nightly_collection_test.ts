@@ -226,54 +226,66 @@ async function storedValueAt(seriesId: number, period: string) {
   return data;
 }
 
-Deno.test("a Publisher revises September: the latest value is stored and the Update log shows old and new", async () => {
+Deno.test("a Publisher revises one past month: the latest value is stored and the Update log shows old and new", async () => {
   await resetCollectedData();
-  await runNightAt("2026-11-05T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-09.json" } });
+  // FRED's real answers of 9 and 10 January 2020, trimmed to start in May 2018.
+  await runNightAt("2020-01-09T22:30:00Z", { fred: { UNRATE: "UNRATE_vintage_2020-01-09_from_2018-05.json" } });
 
-  // FRED publishes October and revises September from 4.2% to 4.3%.
-  await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10_september_revised.json" } });
+  // FRED publishes December 2019 and revises July 2018 from 3.9% to 3.8%.
+  await runNightAt("2020-01-10T22:30:00Z", { fred: { UNRATE: "UNRATE_vintage_2020-01-10_from_2018-05.json" } });
 
   const id = await unrateSeriesId();
-  assertEquals(await storedValueAt(id, "2026-09-01"), [{ value: 4.3, is_new: false }]);
-  assertEquals((await storedValues(id)).count, 945);
+  assertEquals(await storedValueAt(id, "2018-07-01"), [{ value: 3.8, is_new: false }]);
+  assertEquals((await storedValues(id)).count, 20);
   const log = await updateLog();
-  assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
-    ["new_value", "New value from FRED: Unemployment rate, United States, October 2026: 4.1%", {
-      period: "2026-10-01",
-      value: 4.1,
+  assertEquals(log.map((e) => [e.kind, e.sentence, e.details]), [
+    ["new_value", "History loaded: May 2018 to November 2019", { first: "2018-05-01", last: "2019-11-01", count: 19 }],
+    ["new_value", "New value from FRED: Unemployment rate, United States, December 2019: 3.5%", {
+      period: "2019-12-01",
+      value: 3.5,
     }],
-    ["revision", "Revision from FRED: Unemployment rate, United States, September 2026: 4.2% → 4.3%", {
-      period: "2026-09-01",
-      old_value: 4.2,
-      new_value: 4.3,
+    ["revision", "Revision from FRED: Unemployment rate, United States, July 2018: 3.9% → 3.8%", {
+      period: "2018-07-01",
+      old_value: 3.9,
+      new_value: 3.8,
     }],
   ]);
 });
 
 Deno.test("a run that revises several months writes one grouped line with the count and largest change, listing every change", async () => {
   await resetCollectedData();
-  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+  // FRED's real answers of 8 and 9 January 2026: the December 2025 release
+  // came with the yearly re-estimate of past months.
+  await runNightAt("2026-01-08T22:30:00Z", { fred: { UNRATE: "UNRATE_vintage_2026-01-08.json" } });
 
-  // FRED revises January, March, June and August 2026.
-  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_2026_revised.json" } });
+  await runNightAt("2026-01-09T22:30:00Z", { fred: { UNRATE: "UNRATE_vintage_2026-01-09.json" } });
 
   const id = await unrateSeriesId();
-  assertEquals(await storedValueAt(id, "2026-06-01"), [{ value: 4.4, is_new: false }]);
-  assertEquals(await storedValueAt(id, "2026-02-01"), [{ value: 4.4, is_new: false }]);
+  assertEquals(await storedValueAt(id, "2025-11-01"), [{ value: 4.5, is_new: false }]);
+  assertEquals(await storedValueAt(id, "2025-12-01"), [{ value: 4.4, is_new: true }]);
   const log = await updateLog();
   assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
+    ["new_value", "New value from FRED: Unemployment rate, United States, December 2025: 4.4%", {
+      period: "2025-12-01",
+      value: 4.4,
+    }],
     [
       "revision",
-      "4 Revisions from FRED: Unemployment rate, United States, January 2026 to August 2026; " +
-      "largest change: June 2026, 4.2% → 4.4%",
+      // Every change is 0.1 point, so the earliest month is named.
+      "8 Revisions from FRED: Unemployment rate, United States, November 2021 to November 2025; " +
+      "largest change: November 2021, 4.2% → 4.1%",
       {
-        count: 4,
-        largest: { period: "2026-06-01", old_value: 4.2, new_value: 4.4 },
+        count: 8,
+        largest: { period: "2021-11-01", old_value: 4.2, new_value: 4.1 },
         changes: [
-          { period: "2026-01-01", old_value: 4.3, new_value: 4.4 },
-          { period: "2026-03-01", old_value: 4.3, new_value: 4.2 },
-          { period: "2026-06-01", old_value: 4.2, new_value: 4.4 },
-          { period: "2026-08-01", old_value: 4.1, new_value: 4.0 },
+          { period: "2021-11-01", old_value: 4.2, new_value: 4.1 },
+          { period: "2022-02-01", old_value: 3.8, new_value: 3.9 },
+          { period: "2023-09-01", old_value: 3.8, new_value: 3.7 },
+          { period: "2024-05-01", old_value: 4.0, new_value: 3.9 },
+          { period: "2025-02-01", old_value: 4.1, new_value: 4.2 },
+          { period: "2025-05-01", old_value: 4.2, new_value: 4.3 },
+          { period: "2025-07-01", old_value: 4.2, new_value: 4.3 },
+          { period: "2025-11-01", old_value: 4.6, new_value: 4.5 },
         ],
       },
     ],
