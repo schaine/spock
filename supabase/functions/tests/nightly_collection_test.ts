@@ -219,7 +219,7 @@ Deno.test("when FRED cannot be reached, the error kept for the Owner never holds
 
 // Revisions (ADR 0005): the corrected value replaces the stored one, and the
 // Update log keeps the old and the new value.
-async function valueOf(seriesId: number, period: string) {
+async function storedValueAt(seriesId: number, period: string) {
   const { data, error } = await visitor.from("series_values").select("value, is_new")
     .eq("series_id", seriesId).eq("period", period);
   if (error) throw error;
@@ -234,7 +234,7 @@ Deno.test("a Publisher revises September: the latest value is stored and the Upd
   await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10_september_revised.json" } });
 
   const id = await unrateSeriesId();
-  assertEquals(await valueOf(id, "2026-09-01"), [{ value: 4.3, is_new: false }]);
+  assertEquals(await storedValueAt(id, "2026-09-01"), [{ value: 4.3, is_new: false }]);
   assertEquals((await storedValues(id)).count, 945);
   const log = await updateLog();
   assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
@@ -258,8 +258,8 @@ Deno.test("a run that revises several months writes one grouped line with the co
   await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_2026_revised.json" } });
 
   const id = await unrateSeriesId();
-  assertEquals(await valueOf(id, "2026-06-01"), [{ value: 4.4, is_new: false }]);
-  assertEquals(await valueOf(id, "2026-02-01"), [{ value: 4.4, is_new: false }]);
+  assertEquals(await storedValueAt(id, "2026-06-01"), [{ value: 4.4, is_new: false }]);
+  assertEquals(await storedValueAt(id, "2026-02-01"), [{ value: 4.4, is_new: false }]);
   const log = await updateLog();
   assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
     [

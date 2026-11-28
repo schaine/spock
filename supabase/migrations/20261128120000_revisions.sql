@@ -15,7 +15,8 @@ declare
 begin
   v_first_load := not exists (select 1 from public.series_values where series_id = p_series_id);
 
-  select s.frequency, s.unit, i.name as indicator, r.name as region, p.name as publisher
+  select s.frequency, s.unit, p.name as publisher,
+    concat_ws(', ', i.name, r.name) as label -- "Unemployment rate, United States"
   into strict v_series
   from public.series s
   join public.indicators i on i.number = s.indicator_number
@@ -45,7 +46,7 @@ begin
   new_value_lines as (
     select format('New value from %s: %s, %s: %s',
         v_series.publisher,
-        concat_ws(', ', v_series.indicator, v_series.region),
+        v_series.label,
         public.format_period(period, v_series.frequency),
         public.format_value(value, v_series.unit)) as sentence,
       jsonb_build_object('period', period, 'value', value) as details,
@@ -65,7 +66,8 @@ begin
     from jsonb_array_elements(p_values) o
   ),
   changes as (
-    select i.period, v.value as old_value, i.value as new_value
+    select i.period, v.value as old_value, i.value as new_value,
+      jsonb_build_object('period', i.period, 'old_value', v.value, 'new_value', i.value) as change
     from incoming i
     join public.series_values v on v.series_id = p_series_id and v.period = i.period
     where v.value <> i.value
@@ -76,14 +78,13 @@ begin
     from changes c
     where v.series_id = p_series_id and v.period = c.period
   ),
-  -- Ties go to the earliest period.
+  -- Ties go to the earliest period, so the same answer always names the same month.
   largest as (
     select * from changes order by abs(new_value - old_value) desc, period limit 1
   ),
   summary as (
     select count(*) as count, min(period) as first, max(period) as last,
-      jsonb_agg(jsonb_build_object('period', period, 'old_value', old_value, 'new_value', new_value)
-        order by period) as changes
+      jsonb_agg(change order by period) as changes
     from changes
   )
   -- One Revision gets its own line; several in one run share one grouped
@@ -94,7 +95,7 @@ begin
     case when s.count = 1 then
       format('Revision from %s: %s, %s: %s → %s',
         v_series.publisher,
-        concat_ws(', ', v_series.indicator, v_series.region),
+        v_series.label,
         public.format_period(l.period, v_series.frequency),
         public.format_value(l.old_value, v_series.unit),
         public.format_value(l.new_value, v_series.unit))
@@ -102,7 +103,7 @@ begin
       format('%s Revisions from %s: %s, %s to %s; largest change: %s, %s → %s',
         s.count,
         v_series.publisher,
-        concat_ws(', ', v_series.indicator, v_series.region),
+        v_series.label,
         public.format_period(s.first, v_series.frequency),
         public.format_period(s.last, v_series.frequency),
         public.format_period(l.period, v_series.frequency),
@@ -110,11 +111,9 @@ begin
         public.format_value(l.new_value, v_series.unit))
     end,
     case when s.count = 1 then
-      s.changes -> 0
+      l.change
     else
-      jsonb_build_object('count', s.count,
-        'largest', jsonb_build_object('period', l.period, 'old_value', l.old_value, 'new_value', l.new_value),
-        'changes', s.changes)
+      jsonb_build_object('count', s.count, 'largest', l.change, 'changes', s.changes)
     end
   from summary s
   cross join largest l;
