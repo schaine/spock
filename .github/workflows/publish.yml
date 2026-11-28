@@ -22,7 +22,7 @@ jobs:
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-      # The Spock project, in Paris. Not a secret.
+      # The Spock project, in Ireland (eu-west-1). Not a secret.
       PROJECT_REF: bzvsfjrthsyepiurmmno
     steps:
       - uses: actions/checkout@v7.0.1
