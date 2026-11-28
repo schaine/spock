@@ -216,3 +216,136 @@ Deno.test("when FRED cannot be reached, the error kept for the Owner never holds
   assert(data.last_error, "The failure was not recorded");
   assert(!data.last_error.includes(TEST_FRED_KEY), `The key was stored: ${data.last_error}`);
 });
+
+// Revisions (ADR 0005): the corrected value replaces the stored one, and the
+// Update log keeps the old and the new value.
+async function storedValueAt(seriesId: number, period: string) {
+  const { data, error } = await visitor.from("series_values").select("value, is_new")
+    .eq("series_id", seriesId).eq("period", period);
+  if (error) throw error;
+  return data;
+}
+
+Deno.test("a Publisher revises September: the latest value is stored and the Update log shows old and new", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-05T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-09.json" } });
+
+  // FRED publishes October and revises September from 4.2% to 4.3%.
+  await runNightAt(WINTER_NIGHT, { fred: { UNRATE: "UNRATE_through_2026-10_september_revised.json" } });
+
+  const id = await unrateSeriesId();
+  assertEquals(await storedValueAt(id, "2026-09-01"), [{ value: 4.3, is_new: false }]);
+  assertEquals((await storedValues(id)).count, 945);
+  const log = await updateLog();
+  assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
+    ["new_value", "New value from FRED: Unemployment rate, United States, October 2026: 4.1%", {
+      period: "2026-10-01",
+      value: 4.1,
+    }],
+    ["revision", "Revision from FRED: Unemployment rate, United States, September 2026: 4.2% → 4.3%", {
+      period: "2026-09-01",
+      old_value: 4.2,
+      new_value: 4.3,
+    }],
+  ]);
+});
+
+Deno.test("a run that revises several months writes one grouped line with the count and largest change, listing every change", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+
+  // FRED revises January, March, June and August 2026.
+  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_2026_revised.json" } });
+
+  const id = await unrateSeriesId();
+  assertEquals(await storedValueAt(id, "2026-06-01"), [{ value: 4.4, is_new: false }]);
+  assertEquals(await storedValueAt(id, "2026-02-01"), [{ value: 4.4, is_new: false }]);
+  const log = await updateLog();
+  assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
+    [
+      "revision",
+      "4 Revisions from FRED: Unemployment rate, United States, January 2026 to August 2026; " +
+      "largest change: June 2026, 4.2% → 4.4%",
+      {
+        count: 4,
+        largest: { period: "2026-06-01", old_value: 4.2, new_value: 4.4 },
+        changes: [
+          { period: "2026-01-01", old_value: 4.3, new_value: 4.4 },
+          { period: "2026-03-01", old_value: 4.3, new_value: 4.2 },
+          { period: "2026-06-01", old_value: 4.2, new_value: 4.4 },
+          { period: "2026-08-01", old_value: 4.1, new_value: 4.0 },
+        ],
+      },
+    ],
+  ]);
+});
+
+Deno.test("a run where the Publisher changed nothing writes nothing to the Update log", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+
+  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+
+  assertEquals((await updateLog()).map((e) => e.sentence), ["History loaded: January 1948 to October 2026"]);
+});
+
+// A value the Publisher stops giving is kept, and the Update log says so once
+// (decided by the Owner on 2026-11-28).
+Deno.test("a Publisher stops giving August: the last value stays and the Update log says so once", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+
+  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_august_withdrawn.json" } });
+  await runNightAt("2026-11-25T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_august_withdrawn.json" } });
+
+  const id = await unrateSeriesId();
+  assertEquals(await storedValueAt(id, "2026-08-01"), [{ value: 4.1, is_new: false }]);
+  const log = await updateLog();
+  assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
+    [
+      "revision",
+      "FRED no longer gives a value for Unemployment rate, United States, August 2026; " +
+      "Spock keeps the last one it gave: 4.1%",
+      { period: "2026-08-01", old_value: 4.1, new_value: null },
+    ],
+  ]);
+});
+
+Deno.test("a Publisher stops giving several months: one grouped line lists them all", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+
+  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_july_august_withdrawn.json" } });
+
+  const log = await updateLog();
+  assertEquals(log.slice(1).map((e) => [e.kind, e.sentence, e.details]), [
+    [
+      "revision",
+      "FRED no longer gives 2 values of Unemployment rate, United States, July 2026 to August 2026; " +
+      "Spock keeps the last ones it gave",
+      {
+        count: 2,
+        changes: [
+          { period: "2026-07-01", old_value: 4.1, new_value: null },
+          { period: "2026-08-01", old_value: 4.1, new_value: null },
+        ],
+      },
+    ],
+  ]);
+});
+
+Deno.test("a value given again unchanged writes nothing, and stopping again is logged again", async () => {
+  await resetCollectedData();
+  await runNightAt("2026-11-23T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+  await runNightAt("2026-11-24T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_august_withdrawn.json" } });
+
+  // August comes back unchanged, then goes away again.
+  await runNightAt("2026-11-25T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10.json" } });
+  await runNightAt("2026-11-26T22:30:00Z", { fred: { UNRATE: "UNRATE_through_2026-10_august_withdrawn.json" } });
+
+  const log = await updateLog();
+  assertEquals(log.slice(1).map((e) => e.details), [
+    { period: "2026-08-01", old_value: 4.1, new_value: null },
+    { period: "2026-08-01", old_value: 4.1, new_value: null },
+  ]);
+});

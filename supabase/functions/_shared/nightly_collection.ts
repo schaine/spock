@@ -1,7 +1,7 @@
 // The nightly collection: for each Series due tonight, ask its Publisher's
 // collector for the values, then record the check in the database, which
-// stores the new values (ADR 0005: latest values only), writes the Update log
-// and updates the check status in one transaction.
+// stores new values, replaces revised ones (ADR 0005: latest values only),
+// writes the Update log and updates the check status in one transaction.
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.119.2";
 import { collectors } from "./collectors/index.ts";
 import type { CollectorTools } from "./collectors/collector.ts";
