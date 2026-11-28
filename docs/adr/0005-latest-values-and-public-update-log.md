@@ -12,3 +12,4 @@ Approved by the Owner, `schaine`, on 2026-11-23, during the grill on the daily d
 
 - Hard to undo: the versions Spock did not keep cannot be recovered later. From the day collection starts, though, the Update log keeps each Revision's old and new value.
 - A Flag already raised stays in the record with its date and the values it was based on, even if a later Revision would no longer trigger it. It is never quietly deleted.
+- A value the Publisher stops giving is kept, not deleted, and the Update log says once that the Publisher no longer gives it. Approved by the Owner on 2026-11-28 (ticket #17).

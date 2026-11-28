@@ -1,9 +1,16 @@
 -- Revisions (ticket #17, ADR 0005): when a Publisher changes a value it
 -- published earlier, the corrected value replaces the stored one and the
--- Update log keeps the old and the new value.
+-- Update log keeps the old and the new value. When a Publisher stops giving
+-- a value it published earlier, Spock keeps the last one and the Update log
+-- says so, once (decided by the Owner on 2026-11-28).
 --
 -- Same as the first version (20261123230000_collection_tables.sql), plus the
--- Revision step at the end of the stored values part.
+-- Revision and the "no longer given" steps at the end of the stored values part.
+
+-- When the Publisher stopped giving this value; null while it still gives it.
+-- Lets the Update log say so once, not every night.
+alter table public.series_values add column withdrawn_at timestamptz;
+
 create or replace function public.record_successful_check(p_series_id bigint, p_values jsonb, p_checked_at timestamptz)
 returns void
 language plpgsql
@@ -117,6 +124,45 @@ begin
     end
   from summary s
   cross join largest l;
+
+  -- A value given again is no longer withdrawn; if it changed, the Revision
+  -- step above has already logged it.
+  update public.series_values v
+  set withdrawn_at = null
+  where v.series_id = p_series_id and v.withdrawn_at is not null
+    and exists (select 1 from jsonb_array_elements(p_values) o where (o ->> 'period')::date = v.period);
+
+  with withdrawn as (
+    update public.series_values v
+    set withdrawn_at = p_checked_at
+    where v.series_id = p_series_id and v.withdrawn_at is null
+      and not exists (select 1 from jsonb_array_elements(p_values) o where (o ->> 'period')::date = v.period)
+    returning v.period, v.value
+  ),
+  summary as (
+    select count(*) as count, min(period) as first, max(period) as last, min(value) as value,
+      jsonb_agg(jsonb_build_object('period', period, 'old_value', value, 'new_value', null)
+        order by period) as changes
+    from withdrawn
+  )
+  insert into public.update_log (logged_at, kind, series_id, sentence, details)
+  select p_checked_at, 'revision', p_series_id,
+    case when count = 1 then
+      format('%s no longer gives a value for %s, %s; Spock keeps the last one it gave: %s',
+        v_series.publisher, v_series.label,
+        public.format_period(first, v_series.frequency),
+        public.format_value(value, v_series.unit))
+    else
+      format('%s no longer gives %s values of %s, %s to %s; Spock keeps the last ones it gave',
+        v_series.publisher, count, v_series.label,
+        public.format_period(first, v_series.frequency),
+        public.format_period(last, v_series.frequency))
+    end,
+    case when count = 1 then changes -> 0
+    else jsonb_build_object('count', count, 'changes', changes)
+    end
+  from summary
+  where count > 0;
 
   insert into public.series_checks as c
     (series_id, last_checked_at, last_success_at, consecutive_failed_nights, last_error)
