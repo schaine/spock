@@ -4,14 +4,15 @@
 do $$
 declare
   missing text[] := '{}';
-  t text;
+  table_name text;
+  job_name text;
 begin
-  foreach t in array array[
+  foreach table_name in array array[
     'regions', 'publishers', 'indicators', 'series',
     'series_values', 'series_checks', 'update_log'
   ] loop
-    if to_regclass('public.' || t) is null then
-      missing := missing || ('table ' || t);
+    if to_regclass('public.' || table_name) is null then
+      missing := missing || ('table ' || table_name);
     end if;
   end loop;
 
@@ -26,9 +27,9 @@ begin
   if to_regclass('cron.job') is null then
     missing := missing || 'Supabase Cron'::text;
   else
-    foreach t in array array['nightly-collection', 'nightly-collection-retry'] loop
-      if not exists (select 1 from cron.job where jobname = t and active) then
-        missing := missing || ('Cron job ' || t);
+    foreach job_name in array array['nightly-collection', 'nightly-collection-retry'] loop
+      if not exists (select 1 from cron.job where jobname = job_name and active) then
+        missing := missing || ('Cron job ' || job_name);
       end if;
     end loop;
   end if;
